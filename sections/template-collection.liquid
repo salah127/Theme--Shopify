@@ -1,0 +1,686 @@
+{%- assign col_img_alignment = section.settings.collection_img_alignment -%}
+
+{% if settings.sidebar_toggle %}
+	{% case section.settings.collection_img_size %}
+		{% when 'small'  %}{%- assign col_img_size = '870x223' -%}
+		{% when 'medium' %}{%- assign col_img_size = '870x335' -%}
+		{% when 'large'  %}{%- assign col_img_size = '870x446' -%}
+	{% endcase %}
+{% else %}
+	{% case section.settings.collection_img_size %}
+		{% when 'small'  %}{%- assign col_img_size = '1170x300' -%}
+		{% when 'medium' %}{%- assign col_img_size = '1170x450' -%}
+		{% when 'large'  %}{%- assign col_img_size = '1170x600' -%}
+	{% endcase %}
+{% endif %}
+
+{% if collection.image %}
+	{%- assign col_img = collection.image | img_url: col_img_size, crop: col_img_alignment -%}
+{% else %}
+	{%- assign col_img = '' -%}
+{% endif %}
+
+{% case section.settings.listing_style %}
+	{% when 'small' %}
+		{% case section.settings.product_img_size %}
+			{% when 'small'  %}{%- assign product_img_size = '170x120' -%}
+			{% when 'medium' %}{%- assign product_img_size = '170x170' -%}
+			{% when 'large'  %}{%- assign product_img_size = '170x213' -%}
+		{% endcase %}
+
+		{% if settings.sidebar_toggle %}
+			{%- assign item_class = 'col-sm-3' -%}
+			{%- assign layout_type = 'small_sb' -%}
+		{% else %}
+			{%- assign item_class = 'col-sm-2' -%}
+			{%- assign layout_type = 'small' -%}
+		{% endif %}
+
+	{% when 'medium' %}
+		{% case section.settings.product_img_size %}
+			{% when 'small'  %}{%- assign product_img_size = '270x190' -%}
+			{% when 'medium' %}{%- assign product_img_size = '270x270' -%}
+			{% when 'large'  %}{%- assign product_img_size = '270x338' -%}
+		{% endcase %}
+
+		{% if settings.sidebar_toggle %}
+			{%- assign item_class = 'col-sm-4' -%}
+			{%- assign layout_type = 'medium_sb' -%}
+		{% else %}
+			{%- assign item_class = 'col-sm-3' -%}
+			{%- assign layout_type = 'medium' -%}
+		{% endif %}
+
+	{% when 'big' %}
+		{% if settings.sidebar_toggle %}
+			{% case section.settings.product_img_size %}
+				{% when 'small'  %}{%- assign product_img_size = '420x295' -%}
+				{% when 'medium' %}{%- assign product_img_size = '420x420' -%}
+				{% when 'large'  %}{%- assign product_img_size = '420x527' -%}
+			{% endcase %}
+			{%- assign item_class = 'col-sm-6' -%}
+			{%- assign layout_type = 'big_sb' -%}
+
+		{% else %}
+			{% case section.settings.product_img_size %}
+				{% when 'small'  %}{%- assign product_img_size = '370x260' -%}
+				{% when 'medium' %}{%- assign product_img_size = '370x370' -%}
+				{% when 'large'  %}{%- assign product_img_size = '370x464' -%}
+			{% endcase %}
+			{%- assign item_class = 'col-sm-4' -%}
+			{%- assign layout_type = 'big' -%}
+
+		{% endif %}
+{% endcase %}
+
+
+{%- assign product_img_alignment = section.settings.product_img_alignment -%}
+
+{% unless settings.sidebar_toggle %}
+	<div class="container">
+{% endunless %}
+{% if col_img.size > 0 %}
+	{% case section.settings.collection_img_style %}
+		{% when 'collection_img_inline' %}
+			<div class="collection_img collection_img__inline">
+				<div>
+					<div class="img_wrapper__{{ section.settings.collection_img_size }}" style="background-image: url( {{ col_img }} );"></div>
+
+
+					<div class="flex_item__text">
+						<h1>{{ collection.title }}</h1>
+					</div>
+					
+				</div>
+			</div>
+
+		{% else %}
+			<div class="collection_img collection_img__overlay">
+				<div class="layer_1 img_wrapper__{{ section.settings.collection_img_size }} img_{{ col_img_alignment }}" style="background-image: url( {{ col_img }} );"></div>
+
+				<div class="layer_2">
+					<div>
+						<h1>{{ collection.title }}</h1>
+					</div>
+				</div>
+			</div>
+
+	{% endcase %}
+{% else %}
+
+	<h1 class="page_heading">{{ collection.title }}</h1>
+
+{% endif %}
+{% unless settings.sidebar_toggle %}
+	</div>
+{% endunless %}
+
+{% unless settings.sidebar_toggle %}
+    <div class="container">
+{% endunless %}
+
+	{% if section.settings.collection_desc_toggle and collection.description.size > 0 %}
+		<div class="collection_desc rte">
+			{{ collection.description }}
+		</div>
+	{% endif %}
+
+	{% if section.settings.collection_tags_toggle and collection.all_tags.size > 0 %}
+		<div class="button_filters">
+			<ul>
+				<li{% unless current_tags %} class="active"{% endunless %}>
+					<a href="{{ collection.url }}">{{ 'layout.collection.all_tags' | t }}</a>
+				</li>
+
+				{% for tag in collection.all_tags %}
+					<li {% if current_tags contains tag %}class="active"{% endif %}>{{ tag | link_to_tag: tag }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+	{% endif %}
+
+	<div class="product_options">
+		<ul class="product_view">
+			<li id="view_grid" data-view="grid" class="active">
+				<i class="fa fa-th" aria-hidden="true"></i>
+			</li>
+			<li id="view_list" data-view="list">
+				<i class="fa fa-th-list" aria-hidden="true"></i>
+			</li>
+		</ul>
+		<div class="product_options__sort">
+			<label for="sort_by_select">{{ 'layout.collection.sort_products' | t }}:</label>
+
+			<select id="sort_by_select">
+				<option value="manual">{{ 'layout.collection.featured' | t }}</option>
+				<option value="best-selling">{{ 'layout.collection.best_selling' | t }}</option>
+				<option value="title-ascending">{{ 'layout.collection.name_a_z' | t }}</option>
+				<option value="title-descending">{{ 'layout.collection.name_z_a' | t }}</option>
+				<option value="price-ascending">{{ 'layout.collection.price_low_high' | t }}</option>
+				<option value="price-descending">{{ 'layout.collection.price_high_low' | t }}</option>
+				<option value="created-ascending">{{ 'layout.collection.old_new' | t }}</option>
+				<option value="created-descending">{{ 'layout.collection.new_old' | t }}</option>
+			</select>
+		</div>
+		
+		<div class="product_options__number">
+			<label for="products_number_select">{{ 'layout.collection.products_number' | t }}:</label>
+			<select id="products_number_select">
+				{% case layout_type %}
+					{% when 'small' %}
+						<option value="12">12</option>
+						<option value="18">18</option>
+						<option value="24">24</option>
+						{% assign productsNumber = 18 %}
+
+					{% when 'small_sb', 'medium' %}
+						<option value="8">8</option>
+						<option value="12">12</option>
+						<option value="16">16</option>
+						{% assign productsNumber = 12 %}
+
+					{% when 'medium_sb' %}
+						<option value="6">6</option>
+						<option value="9">9</option>
+						<option value="12">12</option>
+						{% assign productsNumber = 9 %}
+
+					{% when 'big' %}
+						<option value="6">6</option>
+						<option value="9">9</option>
+						<option value="12">12</option>
+						{% assign productsNumber = 6 %}
+
+					{% when 'big_sb' %}
+						<option value="4">4</option>
+						<option value="6">6</option>
+						<option value="8">8</option>
+						{% assign productsNumber = 4 %}
+				{% endcase %}
+			</select>
+		</div>
+
+		<div class="product_count">{{ collection.all_products_count }} {{ 'layout.product.items' | t }}</div>
+		<div class="clearfix"></div>
+	</div>
+
+	{% if template == 'collection' %}
+		{% assign paginate_by = productsNumber %}
+		{% comment %}{% assign paginate_by = 3 %}{% endcomment %}
+	{% else %}
+		{% assign paginate_by = template | replace: 'collection.' %}
+	{% endif %}
+
+	{% paginate collection.products by paginate_by %}
+		<script>
+			{% if section.settings.pagination_type == 'load_more' %} 
+				theme.paginationTypeLoad = true;
+			{% else %}
+				theme.paginationTypeLoad = false;
+			{% endif %}
+
+			theme.paginationCurrent = {{ paginate.current_page }};
+			theme.paginatePages = {{ paginate.pages }};
+			theme.productNumber = {{ paginate_by }};
+
+			{% if collection.handle == 'all' %} 
+				theme.collectionName = 'collection-{{ collection.handle }}';
+			{% elsif collection  %}	
+				theme.collectionName = '{{ collection.handle }}';
+			{% endif %}
+		</script>
+
+		<div class="row product_listing__main layout__{{ layout_type }}" id="product_listing__sorted">
+			{% for product in collection.products %}
+				<div class="{{ item_class }} {% cycle 'step6': 'item_6_1', '', '', '', '', '' %} {% cycle 'step4': 'item_4_1', '', '', '' %} {% cycle 'step3': 'item_3_1', '', '' %} {% cycle 'step2': 'item_2_1', '' %}">
+					{% include 'product-listing-item' img_size: product_img_size, img_alignment: product_img_alignment %}
+				</div>
+			{% endfor %}
+		</div>
+
+
+		{% if section.settings.pagination_type == 'default' %}
+			{% assign pagination_items = 'layout.pagination.products' | t %}
+			{% include 'snippet-pagination' with pagination_items %}
+		{% else %}
+			{% if paginate.pages > 1 %}
+				<div class="load_more_wrap">
+					{%- assign pages_difference =  paginate.pages | minus: paginate.current_page -%} 
+				
+					<button class="btn load_more_btn {% if pages_difference == 0 %}hidden{% endif %}" id="load_more_button">{{ 'layout.pagination.more_button' | t }}</button>
+					<div id="page_navigation">
+
+						<span class="page_navigation_arrow {% unless paginate.current_page > 1 %}hidden{% endunless %}" id="page_navigation_prev_prev"><i class="fa fa-angle-double-left"></i></span>
+					    
+						<span class="page_navigation_arrow  {% unless paginate.current_page > 2 %}hidden{% endunless %}" id="page_navigation_prev"><i class="fa fa-angle-left"></i></span>
+						
+						<span id="page_navigation_current">{{ paginate.current_page }}</span>
+
+						<span class="page_navigation_arrow {% unless pages_difference > 1 %}hidden{% endunless %}" id="page_navigation_next"><i class="fa fa-angle-right"></i></span>
+						
+						<span class="page_navigation_arrow {% unless pages_difference > 0 %}hidden{% endunless %}" id="page_navigation_next_next"><i class="fa fa-angle-double-right"></i></span>
+					</div>
+				</div>
+			{% endif %}
+		{% endif %}
+
+	{% endpaginate %}
+
+{% unless settings.sidebar_toggle %}
+	</div>
+{% endunless %}
+
+
+
+{% schema %}
+{
+	"name": "Collection page",
+	"class": "section_template section_template__collection",
+	"settings": [
+		{
+			"type": "select",
+			"id": "listing_style",
+			"label": "Listing style",
+			"default": "medium",
+			"options": [
+				{
+					"value": "small",
+					"label": "Small"
+				},
+				{
+					"value": "medium",
+					"label": "Medium"
+				},
+				{
+					"value": "big",
+					"label": "Big"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "pagination_type",
+			"label": "Pagination type",
+			"default": "default",
+			"options": [
+				{
+					"value": "default",
+					"label": "Default"
+				},
+				{
+					"value": "load_more",
+					"label": "Load more"
+				}
+			]
+		},
+		// COLLECTION IMAGE ///////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "header",
+			"content": "Collection image"
+		},
+		{
+			"type": "select",
+			"id": "collection_img_style",
+			"label": "Collection image style",
+			"default": "collection_img_inline",
+			"options": [
+				{
+					"value": "none",
+					"label": "None"
+				},
+				{
+					"value": "collection_img_inline",
+					"label": "Collection image: inline"
+				},
+				{
+					"value": "collection_img_overlay",
+					"label": "Collection image: overlay"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "collection_img_size",
+			"label": "Collection image size",
+			"default": "small",
+			"options": [
+				{
+					"value": "small",
+					"label": "Small"
+				},
+				{
+					"value": "medium",
+					"label": "Medium"
+				},
+				{
+					"value": "large",
+					"label": "Large"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "collection_img_alignment",
+			"label": "Collection image alignment",
+			"default": "center",
+			"options": [
+				{
+					"value": "top",
+					"label": "Top"
+				},
+				{
+					"value": "center",
+					"label": "Middle"
+				},
+				{
+					"value": "bottom",
+					"label": "Bottom"
+				}
+			]
+		},
+
+		// COLLECTION SETTINGS ////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "header",
+			"content": "Collection settings"
+		},
+		{
+			"type": "checkbox",
+			"id": "collection_desc_toggle",
+			"label": "Collection description"
+		},
+		{
+			"type": "checkbox",
+			"id": "collection_tags_toggle",
+			"label": "Show tags"
+		},
+
+		// PRODUCT LISTING ////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "header",
+			"content": "Product listing"
+		},
+		{
+			"type": "select",
+			"id": "product_img_size",
+			"label": "Product image size",
+			"default": "medium",
+			"options": [
+				{
+					"value": "small",
+					"label": "Small"
+				},
+				{
+					"value": "medium",
+					"label": "Medium"
+				},
+				{
+					"value": "large",
+					"label": "Large"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "product_img_alignment",
+			"label": "Product image alignment",
+			"default": "center",
+			"options": [
+				{
+					"value": "top",
+					"label": "Top"
+				},
+				{
+					"value": "center",
+					"label": "Middle"
+				},
+				{
+					"value": "bottom",
+					"label": "Bottom"
+				}
+			]
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) {
+
+	// LOAD COLLECTION CONTENT         
+																		 // when loading a page, we compare the value from the cookie and load the content onto the page
+	if( theme.paginationTypeLoad && theme.collectionName.length > 0 ){   
+		var collectionUrlCookie = $.cookie(theme.collectionName);
+		if( collectionUrlCookie ){        								 // if there is a cookie, if there is a search in the URL and there is a page in the search 
+
+			if ( document.location.search.indexOf('page=') != -1 ){
+				var urlPage = document.location.search.match(/\?page=\d{1,3}/)[0];
+				var reloadUrl = document.location.href.replace(/\?page=\d{1,3}/, collectionUrlCookie);
+
+				if( urlPage != collectionUrlCookie ){
+																		// reloading to the page with the replacement of the page number by the number from the cookie
+					document.location.href = reloadUrl;
+				}
+			}
+
+		} 
+	}
+
+	// PRODUCTS VIEW GRID/LIST
+	if ( typeof $.cookie('productSortView') == 'undefined' ) {
+		$.cookie('productSortView', 'grid', {path: '/'});
+	}
+	else if ( $.cookie('productSortView') == 'list' ) {
+		$('#view_grid').removeClass('active');
+		$('#view_list').addClass('active');
+
+		$('#product_listing__sorted').addClass('product_listing__list');
+
+	};
+
+	$('#view_grid, #view_list').on('click', function() {
+		var thisView = $(this).data('view');
+
+		$('#view_grid, #view_list').removeClass('active');
+		$('#product_listing__sorted').removeClass('product_listing__list product_listing__grid');
+
+		$(this).addClass('active');
+
+		$.cookie('productSortView', thisView, {path: '/'});
+		$('#product_listing__sorted').addClass( 'product_listing__' + thisView );
+
+	});
+
+
+	// PRODUCTS NUMBER
+	$('#products_number_select option[value=' + theme.productNumber + ']').prop('selected', 'true');
+
+	$('#products_number_select').on('change', function() {
+		if ( document.location.pathname.indexOf('types') > 0 || document.location.pathname.indexOf('vendors') > 0 ) {
+
+			if ( document.location.search.indexOf('sort_by=') > 0 && document.location.search.indexOf('&view=') > 0 ) {
+				var locationSearch = document.location.search.replace(/&sort_by=(\w|\-)+/, '&sort_by=' + $('#sort_by_select').val()).replace(/\&view=\d{1,2}/, '&view=' + $(this).val());
+
+				var productSortQuery = document.location.origin + document.location.pathname + locationSearch;
+			} else {
+				var productSortQuery = document.location.origin + document.location.pathname + document.location.search + '&page=1&sort_by=' + $('#sort_by_select').val() + '&view=' + $(this).val();
+				
+			}
+
+		} else {
+			var productSortQuery = document.location.origin + document.location.pathname + '?page=1&sort_by=' + $('#sort_by_select').val() + '&view=' + $(this).val();
+		}
+		document.location.href = productSortQuery;
+		
+	});
+
+
+
+	// PRODUCTS SORTING
+	$('#sort_by_select option').each(function() {
+		if ( document.location.href.indexOf( $(this).attr('value') ) != -1 ) {
+			$(this).attr('selected', 'selected');
+		};
+
+	});
+
+	$('#sort_by_select').on('change', function() {
+		if ( document.location.pathname.indexOf('types') > 0 || document.location.pathname.indexOf('vendors') > 0 ) {
+			if ( document.location.search.indexOf('sort_by=') > 0 && document.location.search.indexOf('&view=') > 0 ) {
+				var locationSearch = document.location.search.replace(/&sort_by=(\w|\-)+/, '&sort_by=' + $(this).val()).replace(/\&view=\d{1,2}/, '&view=' + theme.productNumber);
+
+				var productSortQuery = document.location.origin + document.location.pathname + locationSearch;
+			} else {
+				var productSortQuery = document.location.origin + document.location.pathname + document.location.search + '&page=1&sort_by=' + $(this).val() + '&view=' + theme.productNumber;
+				
+			}
+
+		} else {
+
+
+			var productSortQuery = document.location.origin + document.location.pathname  + '?page=1&sort_by=' + $(this).val() + '&view=' + theme.productNumber;
+		}
+
+		document.location.href = productSortQuery;
+	});
+
+
+	
+
+
+
+	// LOAD MORE STYLE PAGINATION
+	if( theme.paginationTypeLoad ){
+		var current_page = theme.paginationCurrent;
+		var pageFirstArrow = $('#page_navigation_prev_prev');
+		var pageLastArrow = $('#page_navigation_next_next');
+		var pagePrevArrow = $('#page_navigation_prev');
+		var pageNextArrow = $('#page_navigation_next');
+		var pageCurrentLabel = $('#page_navigation_current');
+
+	
+		// LOAD MORE BUTTON
+		$('#load_more_button').on('click', function() {     			//  when clicking on the button the load is replaced in the URL of the page number on the +1
+			var currentUrl = document.location.href;   					 // and load into a container
+
+			if (document.location.href.indexOf('page=') > 0 ) {
+				var newUrl = currentUrl.replace(/\?page=\d{1,3}/, '?page=' + (current_page + 1));
+			} else {
+				if (document.location.search.length > 0 ) {
+					var newUrl = currentUrl +'&page=' + (current_page + 1);
+				} else {
+					var newUrl = currentUrl +'?page=' + (current_page + 1);
+				}
+			}
+
+			var tempDiv = document.createElement('div');   				// create a temporary block in which we load content from url
+			tempDiv.setAttribute('style', 'display: none;');
+			tempDiv.id = 'further_loaded_content';
+
+			$('#product_listing__sorted').addClass('loader_on');  									// preloader on
+
+			$(tempDiv).load( newUrl + ' #product_listing__sorted> *', function(){  					// add content from the diva to the end of the listing
+				$('#product_listing__sorted').append( $(tempDiv).html() ).removeClass('loader_on');  
+				tempDiv.remove();																	// remove the temporary div
+				
+			});
+			current_page ++; 																		// increase the page count by 1
+
+			showHideLoadMoreButton(current_page);
+
+			$.cookie(theme.collectionName, '?page=' + current_page , {path: '/'}); 					 // set cookie with the modified page
+
+			redefinitionPagination(current_page);  													 // reloading pagination
+			return current_page; 																	 // return the number of the current page
+
+
+		});
+		
+
+		// SHOW/HIDE LOAD MORE BUTTON
+		var showHideLoadMoreButton = function(page){  				// if the page is the last one we hid the button
+			if( page == theme.paginatePages ){ 
+				$('#load_more_button').addClass('hidden');
+			} else {
+				if( $('#load_more_button').hasClass('hidden') ){
+					$('#load_more_button').removeClass('hidden');
+				}
+			}
+		};
+
+
+		// PAGINATION FOR LOAD MORE
+		var checkStateOfPagination = function(page){
+			if ( page > 1 &&  pageFirstArrow.hasClass('hidden') ){pageFirstArrow.removeClass('hidden');}; 	// Here we hide the arrows at the extreme values of pagination
+			if ( page == 1 && !(pageFirstArrow.hasClass('hidden')) ){pageFirstArrow.addClass('hidden');}; 
+			if ( page > 2 &&  pagePrevArrow.hasClass('hidden') ){pagePrevArrow.removeClass('hidden');};
+			if ( page <= 2 && !(pagePrevArrow.hasClass('hidden')) ){pagePrevArrow.addClass('hidden');};  
+																										
+			if ( (theme.paginatePages - page) <= 1 && !(pageNextArrow.hasClass('hidden')) ){
+				pageNextArrow.addClass('hidden');
+			};
+			if ( (theme.paginatePages - page) == 0 && !(pageLastArrow.hasClass('hidden')) ){
+				pageLastArrow.addClass('hidden');
+			};
+			if ( (theme.paginatePages - page) > 0 &&  pageLastArrow.hasClass('hidden') ) {
+				pageLastArrow.removeClass('hidden');
+			};
+			if ( (theme.paginatePages - page) > 1 &&  pageNextArrow.hasClass('hidden') ) {
+				pageNextArrow.removeClass('hidden');
+			};
+		};
+
+		var redefinitionPagination = function(page){ 					// pagination loading function, gets the page number argument
+			pageCurrentLabel.html(page);
+			checkStateOfPagination(page);
+		};
+
+
+		// ADD EVENT ON PAGINATION BUTTON  								// add events to the pagination buttons 
+		pageFirstArrow.on('click', function(e) {
+			if ( document.location.search.indexOf('page=') != -1 ){
+				var newPageUrl = document.location.href.replace(/\?page=\d{1,3}/, '?page=1');
+			} else {
+				var newPageUrl = document.location.href + '?page=1';
+			}
+			$.cookie(theme.collectionName, '?page=1', {path: '/'});
+			document.location.href = newPageUrl;
+		});
+
+		pageLastArrow.on('click', function(e) {
+			if ( document.location.search.indexOf('page=') != -1 ){
+				var newPageUrl = document.location.href.replace(/\?page=\d{1,3}/, '?page=' + theme.paginatePages);
+			} else {
+				var newPageUrl = document.location.href + '?page=' + theme.paginatePages;
+			}
+			$.cookie(theme.collectionName, '?page=' + theme.paginatePages, {path: '/'});
+			document.location.href = newPageUrl;
+		});
+
+		pagePrevArrow.on('click', function(e) {
+			if ( document.location.search.indexOf('page=') != -1 ){
+				var newPageUrl = document.location.href.replace(/\?page=\d{1,3}/, '?page=' + ( current_page - 1 ));
+			} else {
+				var newPageUrl = document.location.href + '?page=' + ( current_page - 1 );
+			}
+			$.cookie(theme.collectionName, '?page=' + ( current_page - 1 ), {path: '/'});
+			document.location.href = newPageUrl;
+		});
+
+		pageNextArrow.on('click', function(e) {
+			if ( document.location.search.indexOf('page=') != -1 ){
+				var newPageUrl = document.location.href.replace(/\?page=\d{1,3}/, '?page=' + ( current_page + 1 ));
+			} else {
+				var newPageUrl = document.location.href + '?page=' + ( current_page + 1 );
+			}
+			$.cookie(theme.collectionName, '?page=' + ( current_page + 1 ), {path: '/'});
+			document.location.href = newPageUrl;
+		});
+
+		redefinitionPagination( current_page );    // call the function when the page loads
+
+	};
+
+
+});
+{% endjavascript %}

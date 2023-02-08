@@ -1,0 +1,480 @@
+{% if section.settings.item_bg_color.size > 0 and section.settings.item_bg_color != 'rgba(0,0,0,0)' %}
+	{% capture item_style %}style="background: {{ section.settings.item_bg_color }};"{% endcapture %}
+	{%- assign item_class = 'with_bg' -%}
+{% endif %}
+
+
+<footer {% if section.settings.inverted %}class="inverted"{% endif %} {% if section.settings.section_bg_color.size > 0 %} style="background: {{ section.settings.section_bg_color }};"{% endif %}> 
+	<div class="footer_row__1"> 
+		<div class="container">
+
+			<div class="row footer_main">
+				{% for block in section.blocks %}
+					<div class="col-sm-3 footer_block {% cycle 'step2': 'footer_block__2_1', '' %}">
+						{% case block.type %}
+							{% when 'linklist' %}
+								{%- assign linklist = block.settings.links -%}
+
+								<div class="footer_item footer_item__links {{ item_class }}" {{ item_style }}>
+									<h3>{{ linklists[linklist].title }}</h3>
+
+									<ul>
+										{% for link in linklists[linklist].links %}
+											<li>
+												<a href="{{ link.url }}">{{ link.title }}</a>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
+
+							{% when 'contacts' %}
+								<div class="footer_item footer_item__contacts {{ item_class }}" {{ item_style }}>
+									<h3>{{ block.settings.contacts_title }}</h3>
+
+									{% if block.settings.contacts_name.size > 0 %}
+										<p class="contact_name"><i class="fa fa-home"></i>{{ block.settings.contacts_name }}</p>
+									{% endif %}
+
+									{% if block.settings.contacts_address.size > 0 %}
+										<p class="contact_address"><i class="fa fa-map-pin"></i>{{ block.settings.contacts_address }}</p>
+									{% endif %}
+
+									{% if block.settings.contacts_phone.size > 0 %}
+										<a class="contact_phone" href="tel:{{ block.settings.contacts_phone }}"><i class="fa fa-volume-control-phone"></i>{{ block.settings.contacts_phone }}</a>
+									{% endif %}
+
+									{% if block.settings.contacts_email.size > 0 %}
+										<a class="contact_email" href="mailto:{{ block.settings.contacts_email }}"><i class="fa fa-envelope"></i>{{ block.settings.contacts_email }}</a>
+									{% endif %}
+								</div>
+
+							{% when 'newsletter' %}
+								<div class="footer_item footer_item__newsletter {{ item_class }}"  {{ item_style }}>
+									<h3>{{ 'layout.footer.newsletter_title' | t }}</h3>
+									
+									{% case settings.newsletter_form_type %}
+										{% when 'newsletter_shopify' %}
+												{% capture newsletterForm %}
+													{% form 'customer', class: 'footer_newsletter_form' %}
+														{{ form.errors | default_errors }}
+
+														<p class="alert alert-success">{{ 'layout.footer.newsletter_success' | t }}</p>
+													
+														{% if block.settings.newsletter_text.size > 0 %}
+															<p class="form_text">{{ block.settings.newsletter_text }}</p>
+														{% else %}	
+															<p class="form_text">{{ 'layout.footer.newsletter_tagline' | t }}</p>
+														{% endif %}
+
+														<input type="hidden" name="contact[tags]" value="Newsletter subscriber">
+														<div class="form_wrapper">
+															<input type="email" name="contact[email]" class="input-group__field newsletter__input" placeholder="Enter your email">
+															<button class="btn" type="submit">{{ 'layout.footer.subscribe_button' | t }}</button>
+														</div>
+														
+													{% endform %}
+												{% endcapture %}
+
+												{% assign newsletterForm = newsletterForm | replace: "'", "&lsquo;" | replace: 'id="contact_form"', 'id="newsletter_form"' | strip_newlines %}
+
+										{% when 'newsletter_mailchimp' %}
+											{% capture newsletterForm %}
+												{% if block.settings.newsletter_text.size > 0 %}
+													<p class="form_text">{{ block.settings.newsletter_text }}</p>
+												{% else %}	
+													<p class="form_text">{{ 'layout.footer.newsletter_tagline' | t }}</p>
+												{% endif %}
+
+												<div class="newsletter_form__mailchimp">
+													<form action="{{ settings.newsletter_mailchimp_url }}" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="footer_newsletter_form">
+														<input required type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Enter your email">
+														<button class="btn" type="submit" name="subscribe" id="mc-embedded-subscribe">{{ 'layout.footer.subscribe_button' | t }}</button>
+													</form>
+												</div>
+											{% endcapture %}
+									{% endcase %}
+
+									{{ newsletterForm }}
+
+									<div class="social_wrap">
+										{% if block.settings.social_title.size > 0 %}
+											<h3 class="social_title">{{ block.settings.social_title }}</h3>
+										{% endif %}
+										<ul>
+											{% if block.settings.social_fb.size > 0 %}
+												<li><a href="{{ block.settings.social_fb }}"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+											{% endif %}
+
+											{% if block.settings.social_tw.size > 0 %}
+												<li><a href="{{ block.settings.social_tw }}"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+											{% endif %}
+
+											{% if block.settings.social_inst.size > 0 %}
+												<li><a href="{{ block.settings.social_inst }}"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+											{% endif %}
+
+											{% if block.settings.social_pin.size > 0 %}
+												<li><a href="{{ block.settings.social_pin }}"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+											{% endif %}
+
+											{% if block.settings.social_gplus.size > 0 %}
+												<li><a href="{{ block.settings.social_gplus }}"><i class="fa fa-google-plus" aria-hidden="true"></i></a></li>
+											{% endif %}
+
+											{% if block.settings.social_yt.size > 0 %}
+												<li><a href="{{ block.settings.social_yt }}"><i class="fa fa-youtube" aria-hidden="true"></i></a></li>
+											{% endif %}
+										</ul>
+									</div>
+								</div>
+
+
+							{% when 'about' %}
+								<div class="footer_item footer_item__about {{ item_class }}"  {{ item_style }}>
+									<h3>{{ block.settings.about_title }}</h3>
+
+									{% if block.settings.footer_logo %}
+										<img src="{{ block.settings.footer_logo | img_url: '100x60', crop:'center' }}" alt="{{ shop.name }}">
+									{% endif %}
+
+									{% if block.settings.about_text.size > 0 %}
+										<div class="about_text">{{ block.settings.about_text }}</div>
+									{% endif %}
+								</div>
+						{% endcase %} 
+					</div>
+				{% endfor %}
+
+			</div>
+
+		</div>
+
+	</div>
+
+	{% if section.settings.powered_toggle or section.settings.payment_icons_toggle %}
+		{% if section.settings.bottom_pannel_color.size > 0 and section.settings.bottom_pannel_color != 'rgba(0,0,0,0)' %}
+			{% capture bottom_pannel_style %}style="background: {{ section.settings.bottom_pannel_color }};"{% endcapture %}
+		{% endif %}
+
+		<div class="footer_row__2 {% if section.settings.bottom_inverted %} bottom_inverted{% endif %}" {{ bottom_pannel_style }}> 
+			<div class="container">
+				<div class="footer_wrap_1">
+					{% if section.settings.powered_toggle %}
+						{% if section.settings.payment_icons_toggle %}
+							<div class="footer_wrap_2 footer_left">
+								©{{ shop.name }}. {{ powered_by_link }}
+							</div>
+						{% else %}	
+							<div class="footer_wrap_2 footer_center">
+								©{{ shop.name }}. {{ powered_by_link }}
+							</div>
+						{% endif %}
+					{% endif %}
+
+					{% if section.settings.payment_icons_toggle %}
+						{% assign payment_icons = 'cc-amex|cc-diners-club|cc-discover|cc-jcb|cc-mastercard|cc-paypal|cc-stripe|cc-visa|google-wallet' | split: '|' %}
+
+						<div class="footer_wrap_2 footer_right">
+							<ul class="footer_payments">
+								{% for i in payment_icons %}
+									{% if section.settings[i] %}
+										<li><i class="fa fa-{{ i }}" aria-hidden="true"></i></li>
+									{% endif %}
+								{% endfor %}
+							</ul>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	{% endif %}
+	<div class="footer_banner" style="background-image: url( {{ 'suitup_footer_banner.png' | asset_url }} );">
+		<div class="banner_text">
+			<h3><b>Upgrade</b> to a Fully-fledged <b>SuitUP!</b></h3>
+			<h4>Featuring a additional pages, plugins, beautiful pictures and fully functionality!</h4>
+			<a href="https://www.templatemonster.com/shopify-themes/suitup-multipurpose-online-store-shopify-theme-70679.html" class="btn">VIEW NOW!</a>
+		</div>
+	</div>
+</footer>
+
+{% if section.settings.padding_top.size > 0 %}
+<style>
+	#shopify-section-footer footer {padding-top: {{ section.settings.padding_top }}px;}
+</style>
+{% endif %}
+	
+{% schema %}
+{
+	"name": "Footer",
+	"max_blocks": 4,
+	"settings": [
+		{
+			"type": "color",
+			"id": "section_bg_color",
+			"label": "Section background color"
+		},
+		{
+			"type": "color",
+			"id": "item_bg_color",
+			"label": "Item background color"
+		},
+		{
+			"type": "checkbox",
+			"id": "inverted",
+			"label": "Inverted style",
+			"default": false
+		},
+		{
+			"type": "color",
+			"id": "bottom_pannel_color",
+			"label": "Bottom pannel color"
+		},
+		{
+			"type": "checkbox",
+			"id": "bottom_inverted",
+			"label": "Bottom pannel inverted style",
+			"default": false
+		},
+		{
+	        "type":      "range",
+	        "id":        "padding_top",
+	        "min":       0,
+	        "max":        100,
+	        "step":       1,
+	        "unit":       "px",
+	        "label":     "Padding top",
+	        "default":   0
+		},
+
+		// POWERED BY /////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "header",
+			"content": "'Powered by Shopify' link"
+		},
+		{
+			"type": "checkbox",
+			"id": "powered_toggle",
+			"label": "Show 'Powered by Shopify'",
+			"default": true
+		},
+
+		// PAYMENT ICONS //////////////////////////////////////////////////////////////////////////
+		{
+			"type": "header",
+			"content": "Payment icons"
+		},
+		{
+			"type": "checkbox",
+			"id": "payment_icons_toggle",
+			"label": "Show payment icons",
+			"default": true
+		},
+		{
+			"type": "checkbox",
+			"id": "cc-amex",
+			"label": "American Express"
+		},
+		{
+			"type": "checkbox",
+			"id": "cc-diners-club",
+			"label": "Diners Club"
+		},
+		{
+			"type": "checkbox",
+			"id": "cc-discover",
+			"label": "Discover"
+		},
+		{
+			"type": "checkbox",
+			"id": "cc-jcb",
+			"label": "JCB"
+		},
+		{
+			"type": "checkbox",
+			"id": "cc-mastercard",
+			"label": "Mastercard"
+		},
+		{
+			"type": "checkbox",
+			"id": "cc-paypal",
+			"label": "Paypal"
+		},
+		{
+			"type": "checkbox",
+			"id": "cc-stripe",
+			"label": "Stripe"
+		},
+		{
+			"type": "checkbox",
+			"id": "cc-visa",
+			"label": "Visa"
+		},
+		{
+			"type": "checkbox",
+			"id": "google-wallet",
+			"label": "Google Wallet"
+		}
+	],
+	"blocks": [
+
+
+		// LINKLIST ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "linklist",
+			"name": "Linklist",
+			"settings": [
+				{
+					"type": "link_list",
+					"id": "links",
+					"label": "Choose linklist"
+				}
+			]
+		},
+
+		// ABOUT BLOCK /////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "about",
+			"name": "About block",
+			"settings": [
+				{
+					"type": "text",
+					"id": "about_title",
+					"label": "Block title",
+					"default": "About"
+				},
+				{
+					"type": "image_picker",
+					"id": "footer_logo",
+					"label": "Footer logo",
+					"info": "Image size 100x60px"
+				},
+				{
+					"type": "richtext",
+					"id": "about_text",
+					"label": "About text"
+				}
+			]
+		},
+
+		// NEWSLETTER ///////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "newsletter",
+			"name": "Newsletter",
+			"limit": 1,
+			"settings": [
+				{
+					"type": "paragraph",
+					"content": "Newsletter"
+				},
+				{
+					"type": "text",
+					"id": "block_title",
+					"label": "Block title",
+					"default": "Newsletter"
+				},
+				{
+					"type": "text",
+					"id": "newsletter_text",
+					"label": "Newsletter text"
+				},
+				{
+					"type": "paragraph",
+					"content": "Social"
+				},
+				{
+					"type": "text",
+					"id": "social_title",
+					"label": "Social title"
+				},
+				{
+					"type": "text",
+					"id": "social_fb",
+					"label": "Facebook"
+				},
+				{
+					"type": "text",
+					"id": "social_tw",
+					"label": "Twitter"
+				},
+				{
+					"type": "text",
+					"id": "social_inst",
+					"label": "Instagram"
+				},
+				{
+					"type": "text",
+					"id": "social_pin",
+					"label": "Pinterest"
+				},
+				{
+					"type": "text",
+					"id": "social_gplus",
+					"label": "Google+"
+				},
+				{
+					"type": "text",
+					"id": "social_yt",
+					"label": "Youtube"
+				}
+			]
+		},
+
+
+		// CONTACTS BLOCK /////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "contacts",
+			"name": "Contacts block",
+			"settings": [
+				{
+					"type": "text",
+					"id": "contacts_title",
+					"label": "Block title"
+				},
+				{
+					"type": "text",
+					"id": "contacts_name",
+					"label": "Contacts name"
+				},
+				{
+					"type": "text",
+					"id": "contacts_address",
+					"label": "Contacts address"
+				},
+				{
+					"type": "text",
+					"id": "contacts_phone",
+					"label": "Contacts phone"
+				},
+				{
+					"type": "text",
+					"id": "contacts_email",
+					"label": "Contacts email"
+				}
+			]
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) { 
+
+	// NEWSLETTER FORM
+	$('.footer_newsletter_form').each(function (){      
+		$(this).on('submit', function(e){
+			var formCookie = $(this).attr('class');
+			$.cookie('footerformSended', formCookie);
+		});
+	});
+	
+	if( document.location.href.indexOf('?customer_posted=true') > 0 && $.cookie('footerformSended') == 'footer_newsletter_form') {
+		$('.footer_newsletter_form .form_wrapper').hide();
+		$('.footer_newsletter_form .form_text').hide();
+		$('.footer_newsletter_form .alert-success').show();
+	}
+
+	$('.footer_newsletter_form').formValidation();
+
+
+});
+{% endjavascript %}

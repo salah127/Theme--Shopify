@@ -1,0 +1,159 @@
+{% comment %}Is this product on sale?{% endcomment %}
+{%- assign on_sale = false -%}
+{%- if product.compare_at_price > product.price -%}
+	{%- assign on_sale = true -%}
+{%- endif -%}
+
+{%- if settings.badge_toggle and settings.new_products_period.size > 0 -%}
+	{% comment %}Is this product new?{% endcomment %}
+	{%- assign date_pub_y = product.published_at | date:'%Y' -%}
+	{%- assign date_pub_d = product.published_at | date:'%j' -%}
+	{%- assign date_now_y = 'now' | date:'%Y' -%}
+	{%- assign date_now_d = 'now' | date:'%j' -%}
+	{%- assign dates_diff_y = date_now_y | minus: date_pub_y | times: 365 -%}
+	{%- assign dates_diff_d = date_now_d | minus: date_pub_d -%}
+	{%- assign dates_diff = dates_diff_y | plus: dates_diff_d -%}
+	{%- assign new_products_period = settings.new_products_period | plus: 0 -%}
+{%- endif -%}
+
+{%- assign product_color_option = settings.color_option | downcase -%}
+
+<div class="product_item">
+	<div class="product_img">
+		<a class="img_change" href="{{ product.url | within: collection }}">
+			<img class="img__1" src="{{ product.featured_image.src | product_img_url: img_size, crop: img_alignment }}" alt="{{ product.featured_image.alt | escape }}">
+			{% if product.images.size > 1 %}
+				<img class="img__2" src="{% for image in product.images limit:1 offset:1 %}{{ image.src | product_img_url: img_size, crop: img_alignment }}{% endfor %}" alt="{% for image in product.images limit:1 offset:1 %}{{ image.alt | escape }}{% endfor %}" />
+			{% endif %}
+			{% if settings.badge_toggle %}
+				{% if settings.new_products_period.size > 0 %}
+					{% if dates_diff <= new_products_period %}<span class="product_badge new">{{ 'layout.product.new_products' | t }}</span>{% endif %}
+				{% endif %}
+
+				{% if on_sale %}
+					{% if settings.sale_type == "text" %}
+						<span class="product_badge sale">{{ 'layout.product.sale' | t }}</span>
+					{% else %}
+						<span class="product_badge sale">–{{ product.compare_at_price_max | minus: product.price | times: 100.0 | divided_by: product.compare_at_price_max | money_without_currency | times: 100 | remove: '.0' }}%</span>
+					{% endif %}
+				{% endif %}
+			{% endif %}	
+		</a>
+	</div>
+
+	<div class="product_info">
+		<p class="product_name">
+			{% if template == 'index' %}
+				<a href="{{ product.url }}">{{ product.title | truncate:50 }}</a>
+			{% else %}
+				<a href="{{ product.url | within: collection }}">{{ product.title | truncate:50 }}</a>
+			{% endif %}
+		</p>
+
+		{% if product.description.size > 0 %}
+			<p class="product_desc product_desc__short">{{ product.description | strip_html | truncate: 100 }}</p>
+			<p class="product_desc product_desc__long">{{ product.description | strip_html | truncate: 500 }}</p>
+		{% endif %}
+
+		<div class="product_prop">
+			<p class="product_price">
+				{% if product.available %}
+					{% if product.variants.size == 1 %}
+						{% if on_sale %}
+							<span class="money money_sale">{{ product.compare_at_price | money }}</span>
+						{% endif %}
+
+						<span class="money">{{ product.price | money }}</span>
+					{% else %}
+						{% assign prices_sorted = product.variants | sort: 'price' %}
+						<span class="money">{{ prices_sorted.first.price | money }}</span>{% unless prices_sorted.first.price == prices_sorted.last.price %} <span class="money_like">–</span> <span class="money">{{ prices_sorted.last.price | money }}</span>{% endunless %}
+						{% comment %}<span class="money_variants">({{ product.variants | size }} {{ 'layout.product.variants' | t }})</span>{% endcomment %}
+					{% endif %}
+				{% else %}
+					{% if on_sale %}
+						<span class="money money_sale">{{ product.compare_at_price | money }}</span>
+					{% endif %}
+
+					<span class="money">{{ product.price | money }}</span>
+				{% endif %}
+			</p>
+
+			<p class="product_color">
+				{%- for option in product.options_with_values -%}
+					{%- assign current_product_option = option.name | downcase -%}
+
+				    {%- if current_product_option == product_color_option -%}
+						{%- for value in option.values -%}
+        					<span class="color_options" style="background-color: {{ value }};" title="{{ value }}"></span>
+						{%- endfor -%}
+				    {%- endif -%}
+				{%- endfor -%}
+			</p>
+		</div>
+
+		<div class="product_links">
+			<form method="post" action="/cart/add" class="add_to_cart_form">
+				{% if product.available %}
+					{% if product.variants.size == 1 %}
+						<input type="hidden" name="id" value="{{ product.variants.first.id }}" />
+						<button class="btn-cart" type="submit"><i class="fa fa-shopping-cart"></i>{{ 'layout.product.add_to_cart' | t }}</button>
+					{% else %}
+						<a class="btn_options" href="{{ product.url }}"><i class="fa fa-shopping-cart"></i>{{ 'layout.product.choose_variant_button' | t }}</a>
+					{% endif %}
+				{% else %}
+					<button class="btn-cart" disabled><i class="fa fa-ban"></i>{{ 'layout.product.unavailable' | t }}</button>
+				{% endif %}
+			</form>
+
+			{% if settings.wishlist_toggle %}
+				{% assign X = 'layout.wishlist.add_to_wishlist' | t %}{% if X.size == 0 %}{% assign X = 'Add to the wishlist' %}{% endif %}
+				{% assign Y = 'layout.wishlist.added_to_wishlist' | t %}{% if Y.size == 0 %}{% assign Y = 'The product was added to your wishlist' %}{% endif %}
+ 
+				{% if customer %}
+					{% assign value = product.handle %}
+					{% assign value0 = product.handle %}
+ 
+					{% for tag in customer.tags %}
+						{% assign tagID = tag %}
+ 
+						{% if tagID contains value %}
+							{% assign value = tagID | prepend:'+0' %}
+						{% endif %}
+ 
+						{% if value.size == 0 %}
+							{% assign value = value0 %}
+						{% endif %}
+					{% endfor %}
+ 
+					{% if value.size != 0 %}
+						{% assign diff = value.size | minus:value0.size | modulo:4 %}
+ 
+						{% if diff == 2 %}
+							{% assign display = false %}
+						{% else %}
+							{% assign display = true %}
+						{% endif %}
+					{% endif %}
+ 
+					{% if display %}
+						<form accept-charset="UTF-8" action="/contact" class="wishlist_form" method="post">
+							<input name="form_type" type="hidden" value="customer">
+							<input name="utf8" type="hidden" value="✓">
+							<input type="hidden" name="contact[email]" value="{{ customer.email }}"/>
+							<input id="update-me" type="hidden" name="contact[tags]" value="{{ value }}" />
+							<a class="wishlist_btn wishlist_add" href="#" title="{{ X }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+						</form>
+					{% else %}
+						<a class="wishlist_btn" href="{{ pages[settings.wishlist_page].url }}" title="{{ Y }}"><i class="fa fa-heart" aria-hidden="true"></i></a>
+					{% endif %}
+				{% else %}
+					<a class="wishlist_btn wishlist_add_login" href="{{ pages[settings.wishlist_page].url }}" title="{{ X }}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+				{% endif %}
+			{% endif %}
+
+			<a class="quick_view_btn" href="{{ product.url }}" title="{{ 'layout.product.quick_view_button' | t }}"><i class="fa fa-search-plus" aria-hidden="true"></i></a>
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+</div>

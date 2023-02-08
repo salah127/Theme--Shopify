@@ -1,0 +1,526 @@
+<div class="container direction_{{ section.settings.content_direction }} {% if section.settings.section_variant == 'linklist' %}with_linklist{% endif %}"> 
+	<div class="section_slider swiper-container {% if section.settings.section_variant == 'lonely' %}fullwidth{% endif %}" id="slideshow_{{ section.id }}" data-autoplay="{{ section.settings.autoplay }}" data-speed="{{ section.settings.autoplay_speed }}">
+		<div class="swiper-wrapper">
+			{% for block in section.blocks %}
+				{% case block.type %}
+					{% when 'image' %}
+						<div class="swiper-slide image_slide">
+							{% if block.settings.image.size > 0 %}
+								<div class="img_placeholder__wrap" style="background-image: url( {{ block.settings.image | img_url: '1170x577', crop: block.settings.img_alignment }} );"></div>
+							{% else %}
+								<div class="img_placeholder__wrap">
+									{% capture current %}{% cycle 1, 2 %}{% endcapture %}
+									{{ 'lifestyle-' | append: current | placeholder_svg_tag: 'img_placeholder' }}
+								</div>
+							{% endif %}
+
+							{% if block.settings.caption_link.size > 0 and block.settings.button_txt.size == 0 %}
+								<a class="slide_caption {{ block.settings.caption_aligment }}" href="{{ block.settings.caption_link }}">
+							{% else %}
+								<div class="slide_caption {{ block.settings.caption_aligment }}">
+							{% endif %}
+
+								<div class="caption_text">
+									{% if block.settings.caption_txt1.size > 0 %}<h2 {% if settings.text-animation and block.settings.title_effect != 'none' %} class="slider_title_animation" data-in-effect="{{ block.settings.title_effect }}" id="title_{{ section.id }}_{{ block.id }}"{% endif %}>{{ block.settings.caption_txt1 }}</h2>{% endif %}
+
+									{% if block.settings.caption_txt2.size > 0 %}<p>{{ block.settings.caption_txt2 }}</p>{% endif %}
+
+									{% if block.settings.caption_link.size > 0 and block.settings.button_txt.size > 0 %}
+										<a class="btn slider_btn" href="{{ block.settings.caption_link }}">{{ block.settings.button_txt }}</a>
+									{% endif %}
+								</div>
+
+							{% if block.settings.caption_link.size > 0 and block.settings.button_txt.size == 0 %}
+								</a>
+							{% else %}
+								</div>
+							{% endif %}
+						</div>
+
+				{% endcase %}
+
+			{% endfor %}
+
+			<div id="pagination_{{ section.id }}" class="swiper_pagination {{ section.settings.pagination_alignment }}"></div>
+
+			<div id="slider_prev_{{ section.id }}" class="swiper_btn swiper_btn__prev"></div>
+			<div id="slider_next_{{ section.id }}" class="swiper_btn swiper_btn__next"></div>
+
+		</div>
+	</div>
+
+	{% if section.settings.section_variant == 'banners' %}
+		<div class="banners_block">
+			<div class="banner_big">
+				{% if section.settings.banner_big_image %}
+					<div class="img_placeholder__wrap" style="background-image: url( {{ section.settings.banner_big_image | img_url: '270x330', crop: section.settings.banner_big_alignment }} );"></div>
+				{% else %}
+					<div class="img_placeholder__wrap">
+						{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+					</div>
+				{% endif %}
+				
+				{% if section.settings.banner_big_link.size > 0 %}
+					<a class="banner_text" href="{{ section.settings.banner_big_link }}">
+				{% else %}
+					<div class="banner_text">
+				{% endif %}
+					{% if section.settings.banner_big_subtitle.size > 0 %}
+						<h4>{{ section.settings.banner_big_subtitle }}</h4>
+					{% endif %}
+
+					{% if section.settings.banner_big_title.size > 0 %}
+						<h3>{{ section.settings.banner_big_title }}</h3>
+					{% endif %}
+
+				{% if section.settings.banner_big_link.size > 0 %}
+					</a>
+				{% else %}
+					</div>
+				{% endif %}
+			</div>
+			
+			<div class="banner_small">
+				<div class="img_placeholder__wrap" style="background-color: {{ section.settings.banner_bg_color }};"></div>
+
+				<div class="banner_caption">
+					{% if section.settings.banner_small_link.size > 0 %}
+						<a class="banner_text" href="{{ section.settings.banner_small_link }}">
+					{% else %}
+						<div class="banner_text">
+					{% endif %}
+						{% if section.settings.banner_small_title.size > 0 %}
+							<h3>{{ section.settings.banner_small_title }}</h3>
+						{% endif %}
+
+						{% if section.settings.banner_small_subtitle.size > 0 %}
+							<h4>{{ section.settings.banner_small_subtitle }}</h4>
+						{% endif %}
+
+					{% if section.settings.banner_small_link.size > 0 %}
+						</a>
+					{% else %}
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	{% if section.settings.section_variant == 'linklist' %}
+		<div class="linklist_block">
+			<div class="menu_wrap linklist_menu_item" {% if section.settings.linklist_bg_color.size > 0 %}style="background-color: {{ section.settings.linklist_bg_color }};"{% endif %}>
+				<h4 class="linklist_title">{{ linklists[section.settings.links].title }}<span class="menu_trigger"><i class="fa fa-caret-down"></i></span></h4>
+				<ul>
+					{% for link in linklists[section.settings.links].links limit: section.settings.link_limit %}
+						<li class="link_item">
+							<a class="linklist_link" href="{{ link.url }}">{{ link.title }}</a>
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+
+	{% endif %}
+</div>
+
+{% schema %}
+{
+	"name": "Slideshow",
+	"class": "section index-section section_homepage section_slideshow",
+	"max_blocks": 5,
+	"settings": [
+		{
+			"type": "checkbox",
+			"id": "autoplay",
+			"label": "Slideshow autoplay",
+			"default": true
+		},
+		{
+			"type": "select",
+			"id": "autoplay_speed",
+			"label": "Autoplay transition duration",
+			"options": [
+				{ "value": "5000", "label": "5 seconds" },
+				{ "value": "6000", "label": "6 seconds" },
+				{ "value": "7000", "label": "7 seconds" },
+				{ "value": "8000", "label": "8 seconds" },
+				{ "value": "9000", "label": "9 seconds" },
+				{ "value": "10000", "label": "10 seconds" }
+			],
+			"default": "7000"
+		},
+		{
+			"type": "select",
+			"id": "section_variant",
+			"label": "Section variant",
+			"default": "lonely",
+			"options": [
+				{
+					"value": "lonely",
+					"label": "Single"
+				},
+				{
+					"value": "banners",
+					"label": "With banners"
+				},
+				{
+					"value": "linklist",
+					"label": "With linklist"
+				}
+			]
+		},
+		{
+			"type": "radio",
+			"id": "content_direction",
+			"label": "Content direction",
+			"options": [
+				{ 
+					"value": "right", 
+					"label": "Slideshow right" 
+				},
+				{ 
+					"value": "left", 
+					"label": "Slideshow left" 
+				}
+			],
+			"default": "left"
+		},
+		{
+			"type": "select",
+			"id": "pagination_alignment",
+			"label": "Pagination alignment",
+			"default": "align_center",
+			"options": [
+				{
+					"value": "align_left",
+					"label": "Left"
+				},
+				{
+					"value": "align_center",
+					"label": "Center"
+				},
+				{
+					"value": "align_right",
+					"label": "Right"
+				}
+			]
+		},
+
+
+		// LINKLIST   ///////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "header",
+			"content": "Menu"
+		},
+		{
+			"type": "link_list",
+			"id": "links",
+			"label": "Choose linklist",
+			"info": "Max 12 links"
+		},
+		{
+			"type": "color",
+			"id": "linklist_bg_color",
+			"label": "Linklist background color"
+		},
+
+		
+		// BIG BANNER   /////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "header",
+			"content": "Banner big"
+		},
+		{
+			"type": "image_picker",
+			"id": "banner_big_image",
+			"label": "Banner image"
+		},
+		{
+			"type": "select",
+			"id": "banner_big_alignment",
+			"label": "Image alignment",
+			"options": [
+				{
+					"value": "top",
+					"label": "Top"
+				},
+				{
+					"value": "center",
+					"label": "Middle"
+				},
+				{
+					"value": "bottom",
+					"label": "Bottom"
+				}
+			]
+		},
+		{
+			"type": "text",
+			"id": "banner_big_subtitle",
+			"label": "Banner subtitle"
+		},
+		{
+			"type": "text",
+			"id": "banner_big_title",
+			"label": "Banner title"
+		},
+		{
+			"type": "url",
+			"id": "banner_big_link",
+			"label": "Banner link"
+		},
+		// SMALL BANNER   /////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "header",
+			"content": "Banner small"
+		},
+		{
+			"type": "color",
+			"id": "banner_bg_color",
+			"label": "Color",
+			"default": "#777777"
+		},
+		{
+			"type": "text",
+			"id": "banner_small_subtitle",
+			"label": "Banner subtitle"
+		},
+		{
+			"type": "text",
+			"id": "banner_small_title",
+			"label": "Banner title"
+		},
+		{
+			"type": "url",
+			"id": "banner_small_link",
+			"label": "Banner link"
+		}
+	],
+	"blocks": [
+
+		// IMAGE SLIDE ////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "image",
+			"name": "Image slide",
+			"settings": [
+
+				// IMAGE //////////////////////////////////////////////////////////////////////////////////
+				{
+					"type": "header",
+					"content": "Image"
+				},
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "Slide image"
+				},
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+
+				// CAPTION ////////////////////////////////////////////////////////////////////////////////
+				{
+					"type": "header",
+					"content": "Caption"
+				},
+				{
+					"type": "select",
+					"id": "caption_aligment",
+					"label": "Caption alignment",
+					"default": "align_left",
+					"options": [
+						{
+							"value": "align_left",
+							"label": "Left"
+						},
+						{
+							"value": "align_center",
+							"label": "Center"
+						},
+						{
+							"value": "align_right",
+							"label": "Right"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"id": "caption_txt1",
+					"label": "Heading",
+					"default": "Slideshow"
+				},
+				{
+					"type": "select",
+					"id": "title_effect",
+					"label": "Title effect",
+					"default": "none",
+					"info": "Before using, you need to enable animation in the general settings",
+					"options": [
+						{
+							"label": "None",
+							"value": "none"
+						},
+						{
+							"label": "RollIn",
+							"value": "rollIn"
+						},
+						{
+							"label": "Flip",
+							"value": "flip"
+						},
+						{
+							"label": "Flash",
+							"value": "flash"
+						},
+						{
+							"label": "Pulse",
+							"value": "pulse"
+						},
+						{
+							"label": "Swing",
+							"value": "swing"
+						},
+						{
+							"label": "Tada",
+							"value": "tada"
+						},
+						{
+							"label": "Wobble",
+							"value": "wobble"
+						},
+						{
+							"label": "Fade In",
+							"value": "fadeIn"
+						},
+						{
+							"label": "Rotate In",
+							"value": "rotateIn"
+						},
+						{
+							"label": "Shake",
+							"value": "shake"
+						},
+						{
+							"label": "Bounce",
+							"value": "bounce"
+						},
+						{
+							"label": "Bounce In Up",
+							"value": "bounceInUp"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"id": "caption_txt2",
+					"label": "Subheading",
+					"default": "Tell your brand's story through video and images"
+				},
+				{
+					"type": "url",
+					"id": "caption_link",
+					"label": "Slide link"
+				},
+				{
+					"type": "text",
+					"id": "button_txt",
+					"label": "Button text",
+					"default": "Shop now"
+				}
+			]
+		}
+	],
+	"presets": [{
+		"name": "Slideshow",
+		"category": "Image",
+		"settings": {
+			"autoplay": true,
+			"autoplay_speed": "5000"
+		},
+		"blocks": [
+			{
+				"type": "image"
+			},
+			{
+				"type": "image"
+			}
+		]
+	}]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) {
+	$('.section_slider').each(function(i) {
+
+		var sliderId = '#' + $(this).attr('id');
+		var sliderVar = $(this).attr('id');
+		var sliderPagination = '#pagination_' + sliderVar.replace('slideshow_', '');
+		var sliderPrev = '#slider_prev_' + sliderVar.replace('slideshow_', '');
+		var sliderNext = '#slider_next_' + sliderVar.replace('slideshow_', '');
+
+		var sliderAutoplay = $(this).data('autoplay');
+		if ( sliderAutoplay == true ) {
+			sliderAutoplay = $(this).data('speed');
+		};
+
+		var sliderVar = new Swiper( sliderId, {
+			effect: 'fade',
+			autoplay: sliderAutoplay,
+			loop: true,
+			speed: 500,
+			autoplayDisableOnInteraction: false,
+
+			pagination: sliderPagination,
+			paginationClickable: true,
+
+			prevButton: sliderPrev,
+			nextButton: sliderNext,
+
+		});
+
+		$(window).on('load', function() {
+			sliderVar.onResize(); // updating swiper after loading
+
+			// TITLE ANIMATION
+			if ( $(window).width() > 992 && theme.titleAnimation ){
+				$(sliderId + ' .slider_title_animation').each(function() {
+					var elemEffect = $(this).data('in-effect');
+					$(this).textillate({
+						in: {
+							effect: elemEffect,
+							initialDelay: 0,
+						},
+						out: {
+							effect: 'fadeOut',
+						},
+						loop: true
+					});
+				})
+			}
+		});
+
+
+		
+
+	});
+
+});
+{% endjavascript %}

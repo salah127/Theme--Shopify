@@ -1,0 +1,407 @@
+<div class="sidebar">
+	{% for block in section.blocks %}
+		{% case block.type %}
+			{% when 'widget_collections' %}
+				<div class="sidebar_widget sidebar_widget__collections">
+						<h3 class="widget_header">{{ block.settings.title | escape }}</h3>
+
+						<div class="widget_content">
+							<ul class="list_links">
+								{% assign tmp_col_size = collection.id | size | plus:0 %}
+
+								{% for collection in collections %}
+
+									{% if tmp_col_size > 0 %}
+										{% assign tmp_col = collection.title | escape | handleize | replace: '-amp-', '-' %}
+									{% endif %}
+
+									<li>
+										<a {% if tmp_col_size > 0 and tmp_col == handle %}class="active"{% endif %} href="{{ collection.url }}">{{ collection.title | escape }}</a>
+									</li>
+
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+
+			{% when 'widget_linklist' %}
+				<div class="sidebar_widget sidebar_widget__linklist">
+						<h3 class="widget_header">{{ block.settings.title | escape }}</h3>
+
+						<div class="widget_content">
+							{%- assign links_small = block.settings.links -%}
+
+							<ul class="list_links">
+
+								{% for link in linklists[links_small].links %}
+									{%- assign child_list_handle = link.title | handleize -%}
+
+									{%- assign link_count = 0 -%}
+									{% for childlink in linklists[child_list_handle].links %}
+										{%- assign link_count = link_count | plus: 1 -%}
+									{% endfor %}
+								
+									<li class="level_1__item {% if link_count > 0 %}with_ul{% endif %}">
+										<a class="level_1__link" href="{{ link.url }}">{{ link.title }}</a>
+
+										{% if link_count > 0 %}
+											<i class="level_1__trigger menu_trigger fa fa-angle-down" data-submenu="submenu_{{ block.id }}-{{ forloop.index }}"></i>
+											<ul class="level_1_2 droped_linklist" id="submenu_{{ block.id }}-{{ forloop.index }}">
+												{% for childlink in linklists[child_list_handle].links %}
+													{%- assign child_list_2_handle = childlink.title | handleize -%}
+
+													{%- assign link_count = 0 -%}
+													{% for childlink in linklists[child_list_2_handle].links %}
+														{%- assign link_count = link_count | plus: 1 -%}
+													{% endfor %}
+														
+													<li class="level_1_2_item {% if link_count > 2 %}with_ul{% endif %}">
+														<a class="level_1_2_link" href="{{ childlink.url }}">{{ childlink.title }}</a>
+
+														{% if link_count > 0 %}
+															<i class="level_1__trigger menu_trigger fa fa-angle-down" data-submenu="subsubmenu_{{ block.id }}-{{ forloop.index }}"></i>
+															<ul class="level_1_3 droped_linklist" id="subsubmenu_{{ block.id }}-{{ forloop.index }}">
+																{% for childlink in linklists[child_list_2_handle].links %}
+																	<li class="level_1_3_item">
+																		<a class="level_1_3_link" href="{{ childlink.url }}">{{ childlink.title }}</a>
+																	</li>
+																{% endfor %}
+															</ul>
+														{% endif %}
+													</li>
+												{% endfor %}
+											</ul>
+										{% endif %}
+									</li>
+	
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+
+			{% when 'widget_types' %}
+				<div class="sidebar_widget sidebar_widget__types">
+					<h3 class="widget_header">{{ block.settings.title | escape }}</h3>
+
+					<div class="widget_content">
+						<ul class="list_links">
+							{% for product_type in shop.types %}
+								{% if product_type.size > 0 %}
+
+									{% if canonical_url contains 'types' %}
+										{% assign tmp_title = page_title | escape | handleize  %}
+										{% assign tmp_type = product_type | escape | handleize  %}
+									{% endif %}
+
+									<li><a {% if tmp_title and tmp_title == tmp_type  %}class="active"{% endif %} href="{{ product_type | url_for_type }}">{{ product_type }}</a></li>
+
+								{% endif %}
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+
+			{% when 'widget_vendors' %}
+				<div class="sidebar_widget sidebar_widget__vendors">
+					<h3 class="widget_header">{{ block.settings.title | escape }}</h3>
+
+					<div class="widget_content">
+						<ul class="list_links">
+							{% for vendor in shop.vendors %}
+
+								{% if canonical_url contains 'vendors' %}
+									{% assign tmp_title = page_title | escape | handleize %}
+									{% assign tmp_vendor = vendor | escape | handleize %}
+								{% endif %}
+
+								<li><a {% if tmp_title and tmp_title == tmp_vendor %}class="active"{% endif %} href="{{ vendor | url_for_vendor }}">{{ vendor }}</a></li>
+
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+
+			{% when 'widget_products' %}
+				<div class="sidebar_widget sidebar_widget__products">
+					<h3 class="widget_header">{{ block.settings.title | escape }}</h3>
+					<div class="widget_content">
+						<ul class="list_products">
+						{% for product in collections[block.settings.products_collection].products limit:3 %}
+							<li class="product">
+								<div class="product_img">  
+									<a href="{{ product.url | within: collection }}">
+										<img src="{{ product.featured_image.src | product_img_url: '150x150', crop:'center' }}" alt="{{ product.featured_image.alt | escape }}" />
+									</a>
+								</div>
+
+								<div class="product_info">
+									<div class="product_name">
+										<a href="{{ product.url | within: collection }}">{{ product.title | truncate: 30 }}</a>
+									</div>
+
+									<div class="product_price">
+										<span class="money">{{ product.price | money }}</span>
+										{% if product.compare_at_price and product.compare_at_price > product.price %}
+											<span class="money compare-at-price">{{ product.compare_at_price | money }}</span>
+										{% endif %}
+									</div>
+
+									<div class="product_links">
+										<a class="btn" href="{{ product.url | within: collection }}">{{ 'layout.product.view_button' | t }}</a>
+									</div>
+								</div>
+							</li>
+						{% endfor %}
+						</ul>
+					</div>
+				</div>
+
+			{% comment %}{% when 'widget_linklist' %}
+				{%- assign sidebar_linklist = block.settings.links -%}
+
+				<div class="sidebar_widget sidebar_widget__linklist">
+					<h3 class="widget_header">{{ linklists[sidebar_linklist].title }}</h3>
+
+					<ul class="list_links">
+						{% for link in linklists[sidebar_linklist].links %}
+							<li>
+								<a href="{{ link.url }}">{{ link.title }}</a>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>{% endcomment %}
+
+			{% when 'custom_html' %}
+				<div class="sidebar_widget sidebar_widget__html">{{ block.settings.html_code }}</div>
+
+			{% when 'widget_banner' %}
+				{% case block.settings.banner_height %}
+					{% when 'small'  %}{%- assign img_size = '270x151' -%}
+					{% when 'medium' %}{%- assign img_size = '270x270' -%}
+					{% when 'large'  %}{%- assign img_size = '270x360' -%}
+				{% endcase %}
+				
+				<div class="sidebar_widget sidebar_widget__banner">
+					{% if block.settings.image.size > 0 %}
+						<div class="img_placeholder__wrap img_placeholder__{{ block.settings.banner_height }}" style="background-image: url( {{ block.settings.image | img_url: img_size, crop: 'center' }} );"></div>
+					{% else %}
+						<div class="img_placeholder__wrap  img_placeholder__{{ block.settings.banner_height }}">
+							{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+						</div>
+					{% endif %}
+
+					<div class="sidebar_banner_caption">
+						{% if block.settings.link.size > 0 %}
+							<a href="{{ block.settings.link }}">
+						{% endif %}
+
+							{% if block.settings.title.size > 0 %}
+								<h3>{{ block.settings.title | escape }}</h3>
+							{% endif %}
+
+							{% if block.settings.text.size > 0 %}
+								<p>{{ block.settings.text | strip_html }}</p>
+							{% endif %}
+
+						{% if block.settings.link.size > 0 %}
+							</a>
+						{% endif %}
+					</div>
+				</div>
+
+
+		{% endcase %}
+	{% endfor %}
+</div>
+
+
+
+{% schema %}
+{
+	"name": "Sidebar",
+	"class": "page_sidebar",
+	"max_blocks": 10,
+	"settings": [
+		{
+			"type": "header",
+			"content": "Sidebar widgets"
+		}
+	],
+	"blocks": [
+		// COLLECTIONS ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_collections",
+			"name": "Collections",
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Collections"
+				}
+			]
+		},
+
+		// PRODUCT TYPES ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_types",
+			"name": "Product types",
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Product types"
+				}
+			]
+		},
+
+		// PRODUCT VENDORS ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_vendors",
+			"name": "Product vendors",
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Product vendors"
+				}
+			]
+		},
+
+		// PRODUCTS ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_products",
+			"name": "Products",
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Products"
+				},
+				{
+					"type": "collection",
+					"id": "products_collection",
+					"label": "Collection"
+				}
+			]
+		},
+
+
+		// LINKLIST ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_linklist",
+			"name": "Linklist",
+			"settings": [
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Widget title",
+					"default": "Linklist"
+				},
+				{
+					"type": "link_list",
+					"id": "links",
+					"label": "Choose linklist"
+				}
+			]
+		},
+
+
+		// CUSTOM HTML ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "custom_html",
+			"name": "HTML code",
+			"settings": [
+				{
+					"type": "html",
+					"id": "html_code",
+					"label": "Custom HTML",
+					"default": "<div><p>You HTML content</p></div>"
+				}
+			]
+		},
+
+
+		// BANNER ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "widget_banner",
+			"name": "Banner",
+			"settings": [
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "Image",
+					"info": "The image should be more than 270px wide to resize and crop properly"
+				},
+				{
+					"type": "select",
+					"id": "banner_height",
+					"label": "Banner height",
+					"default": "medium",
+					"options": [
+						{
+							"label": "Small (270x151)",
+							"value": "small"
+						},
+						{
+							"label": "Medium (270x270)",
+							"value": "medium"
+						},
+						{
+							"label": "Large (270x360)",
+							"value": "large"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"id": "title",
+					"label": "Heading",
+					"default": "Title"
+				},
+				{
+					"type": "text",
+					"id": "text",
+					"label": "Text",
+					"default": "Banner text"
+				},
+				{
+					"type": "url",
+					"id": "link",
+					"label": "Link"
+				}
+
+			]
+		}
+	]
+}
+{% endschema %}
+
+
+{% javascript %}
+(function($) {
+
+	// LINKLIST ITEM SHOW/HIDE ELEMENT
+	$(window).on('load', function() {
+		$('.sidebar_widget__linklist .menu_trigger').each(function(i) {
+			var targetMenu = '#' + $(this).data('submenu');
+
+			$(this).on('click', function(e){
+				if ($(this).hasClass('active')){
+					$(targetMenu).hide(300);
+					$(this).removeClass('active');
+				} else {
+					$(targetMenu).show(300);
+					$(this).addClass('active');
+				};
+			});
+		});
+	
+	});
+
+
+})(jQuery);
+{% endjavascript %}

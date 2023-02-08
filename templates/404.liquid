@@ -1,0 +1,20 @@
+<div class="template_404">
+	<div class="page_container">
+		<div class="container">
+			<h1>{{ 'pages.404.title_1' | t }}</h1>
+			<h2>{{ 'pages.404.title_2' | t }}</h2>
+			<h3>{{ 'pages.404.title_3' | t }}</h3>
+			
+			<div class="page_search">
+				<form action="/search" method="get" role="search" class="search_item">
+					<input type="search" name="q" placeholder="{{ 'pages.404.search' | t }}" aria-label="{{ 'pages.404.search' | t }}">
+
+					<button class="btn" type="submit">{{ 'pages.search.search' | t }}</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="page_footer container">
+		©{{ shop.name }}. {{ powered_by_link }}
+	</div>
+</div>

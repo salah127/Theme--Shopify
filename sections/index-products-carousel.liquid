@@ -1,0 +1,465 @@
+{%- case section.settings.img_size -%}
+	{%- when 'small'  -%}{%- assign img_size = '270x190' -%}{%- assign img_rate = 'small' -%}
+	{%- when 'medium' -%}{%- assign img_size = '270x270' -%}{%- assign img_rate = 'medium' -%}
+	{%- when 'large'  -%}{%- assign img_size = '270x341' -%}{%- assign img_rate = 'large' -%}
+{%- endcase -%}
+
+{%- capture img_alignment -%}{{ section.settings.img_alignment }}{%- endcapture -%}
+
+{%- assign productsNum = collections[section.settings.section_collection].products_count | plus: 0 -%}
+{%- assign productsNumHalf = collections[section.settings.section_collection].products_count | divided_by: 2 -%}
+{%- assign productsCount = section.settings.products_count | plus: 0 -%}
+{%- assign productsCountHalf = productsCount | divided_by: 2 -%}
+{%- assign productsRows = section.settings.carousel_rows | plus: 0 -%}
+{%- assign productsDir = section.settings.carousel_direction | plus: 0 -%}
+
+<div class="carousel_wrap container{% if section.settings.section_bg_color.size > 0 and section.settings.section_bg_color != 'rgba(0,0,0,0)' %} with_bg" style="background-color: {{ section.settings.section_bg_color }};" {% else %}"{% endif %}>
+	{% if section.settings.section_title.size > 0 %}
+		<h2 class="section_heading">{{ section.settings.section_title | escape }}</h2>
+	{% endif %}
+
+
+	{% if productsNum <= 4 %}
+		<div class="product_listing__main row">
+			{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+				<div class="col-sm-3">
+					{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+				</div>
+			{% endfor %}
+		</div>
+
+	{% elsif productsNum > 4 and productsNum <= 8 %}
+		{% case productsCount %}
+			{% when 4 %}
+				<div class="product_listing__main row">
+					{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+						<div class="col-sm-3">
+							{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+						</div>
+					{% endfor %}
+				</div>
+
+			{% else %}
+				{% case productsRows %}
+					{% when 1 %}
+						<div class="products_carousel swiper-container" id="products_carousel_{{ section.id }}" data-products="{{ productsNum }}" data-rows="{{ section.settings.carousel_rows }}" data-dir="{{ productsDir }}">
+							<div class="swiper-wrapper product_listing__main">
+								{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+									<div class="swiper-slide">
+										{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<div id="carousel_swiper__prev_{{ section.id }}" class="swiper_btn swiper_btn__prev"></div>
+						<div id="carousel_swiper__next_{{ section.id }}" class="swiper_btn swiper_btn__next"></div>
+					
+					{% else %}
+						<div class="product_listing__main row">
+							{% for product in collections[section.settings.section_collection].products limit:4 %}
+								<div class="col-sm-3">
+									{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+								</div>
+							{% endfor %}
+						</div>
+
+						<div class="product_listing__main row">
+							{% for product in collections[section.settings.section_collection].products offset:4 %}
+								<div class="col-sm-3">
+									{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+								</div>
+							{% endfor %}
+						</div>
+
+				{% endcase %}
+
+		{% endcase %}
+
+	{% else %}
+		{% case productsCount %}
+			{% when 4 %}
+				<div class="product_listing__main row">
+					{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+						<div class="col-sm-3">
+							{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+						</div>
+					{% endfor %}
+				</div>
+
+			{% when 8 %}
+				{% case productsRows %}
+					{% when 1 %}
+						<div class="products_carousel swiper-container" id="products_carousel_{{ section.id }}" data-products="{{ productsNum }}" data-rows="{{ section.settings.carousel_rows }}" data-dir="{{ productsDir }}">
+							<div class="swiper-wrapper product_listing__main">
+								{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+									<div class="swiper-slide">
+										{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<div id="carousel_swiper__prev_{{ section.id }}" class="swiper_btn swiper_btn__prev"></div>
+						<div id="carousel_swiper__next_{{ section.id }}" class="swiper_btn swiper_btn__next"></div>
+
+					{% else %}
+						<div class="product_listing__main row">
+							{% for product in collections[section.settings.section_collection].products limit:4 %}
+								<div class="col-sm-3">
+									{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+								</div>
+							{% endfor %}
+						</div>
+
+						<div class="product_listing__main row">
+							{% for product in collections[section.settings.section_collection].products offset:4 limit:4 %}
+								<div class="col-sm-3">
+									{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+								</div>
+							{% endfor %}
+						</div>
+
+				{% endcase %}
+
+			{% else %}
+				{% case productsRows %}
+					{% when 1 %}
+						<div class="products_carousel swiper-container" id="products_carousel_{{ section.id }}" data-products="{{ productsNum }}" data-rows="{{ section.settings.carousel_rows }}" data-dir="{{ productsDir }}">
+							<div class="swiper-wrapper product_listing__main">
+								{% for product in collections[section.settings.section_collection].products limit:productsCount %}
+									<div class="swiper-slide">
+										{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %} 
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<div id="carousel_swiper__prev_{{ section.id }}" class="swiper_btn swiper_btn__prev"></div>
+						<div id="carousel_swiper__next_{{ section.id }}" class="swiper_btn swiper_btn__next"></div>
+
+					{% else %}
+						<div class="products_carousel " id="products_carousel_{{ section.id }}" data-products="{{ productsNum }}" data-rows="{{ section.settings.carousel_rows }}" data-dir="{{ productsDir }}">
+							<div class="swiper-container swiper_1">
+								<div class="swiper-wrapper product_listing__main">
+									{% if productsNum < productsCount %}
+										{% for product in collections[section.settings.section_collection].products limit:productsNumHalf %}
+											<div class="swiper-slide">
+												{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %}
+											</div>
+										{% endfor %}
+									{% else %}
+										{% for product in collections[section.settings.section_collection].products limit:productsCountHalf %}
+											<div class="swiper-slide">
+												{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %}
+											</div>
+										{% endfor %}
+									{% endif %}
+								</div>
+
+								<div class="carousel_1_prev"></div>
+								<div class="carousel_1_next"></div>
+							</div>
+
+							<div class="swiper-container swiper_2">
+								<div class="swiper-wrapper product_listing__main">
+									{% if productsNum < productsCount %}
+										{% for product in collections[section.settings.section_collection].products offset:productsNumHalf %}
+											<div class="swiper-slide">
+												{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %}
+											</div>
+										{% endfor %}
+									{% else %}
+										{% for product in collections[section.settings.section_collection].products offset:productsCountHalf %}
+											<div class="swiper-slide">
+												{% include 'product-listing-item' img_size: img_size, img_alignment: img_alignment %}
+											</div>
+										{% endfor %}
+									{% endif %}
+								</div>
+
+								<div class="carousel_2_prev"></div>
+								<div class="carousel_2_next"></div>
+
+							</div>
+
+							<div id="carousel_swiper__prev_{{ section.id }}" class="swiper_btn swiper_btn__prev swiper_2row"></div>
+							<div id="carousel_swiper__next_{{ section.id }}" class="swiper_btn swiper_btn__next swiper_2row"></div>
+							
+						</div>
+
+
+				{% endcase %}
+
+			{% endcase %}
+
+	{% endif %}
+	
+
+</div>
+
+
+{% schema %}
+{
+	"name": "Products carousel",
+	"class": "section section_homepage section_products-carousel",
+	"settings": [
+		{
+			"id": "section_title",
+			"type": "text",
+			"label": "Heading",
+			"default": "Popular products"
+		},
+		{
+			"type": "color",
+			"id": "section_bg_color",
+			"label": "Background color"
+		},
+		{
+			"type": "collection",
+			"id": "section_collection",
+			"label": "Collection"
+		},
+		{
+			"type": "select",
+			"id": "products_count",
+			"label": "Carousel products count",
+			"options": [
+				{
+					"value": "4",
+					"label": "4"
+				},
+				{
+					"value": "8",
+					"label": "8"
+				},
+				{
+					"value": "12",
+					"label": "12"
+				},
+				{
+					"value": "16",
+					"label": "16"
+				},
+				{
+					"value": "20",
+					"label": "20"
+				}
+			]
+		},
+		{
+			"type": "radio",
+			"id": "carousel_rows",
+			"label": "Carousel rows",
+			"options": [
+				{
+					"value": "1",
+					"label": "One row"
+				},
+				{
+					"value": "2",
+					"label": "Two rows"
+				}
+			]
+		},
+		{
+			"type": "radio",
+			"id": "carousel_direction",
+			"label": "Carousel direction",
+			"options": [
+				{
+					"value": "1",
+					"label": "One-way"
+				},
+				{
+					"value": "2",
+					"label": "Two-way (for two rows only)"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "img_size",
+			"label": "Image size",
+			"options": [
+				{
+					"value": "small",
+					"label": "Small (270x190)"
+				},
+				{
+					"value": "medium",
+					"label": "Medium (270x270)"
+				},
+				{
+					"value": "large",
+					"label": "Large (270x341)"
+				}
+			]
+		},
+		{
+			"type": "select",
+			"id": "img_alignment",
+			"label": "Image alignment",
+			"options": [
+				{
+					"value": "top",
+					"label": "Top"
+				},
+				{
+					"value": "center",
+					"label": "Middle"
+				},
+				{
+					"value": "bottom",
+					"label": "Bottom"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Products carousel",
+			"category": "Products"
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) {
+	$('.products_carousel').each(function(i) {
+
+		var sliderId = '#' + $(this).attr('id');
+		var sliderVar = $(this).attr('id');
+		var sliderPrev = '#carousel_swiper__prev_' + sliderVar.replace('products_carousel_', '');
+		var sliderNext = '#carousel_swiper__next_' + sliderVar.replace('products_carousel_', '');
+		var productsQ = $(this).data('products');
+		var sliderRows = $(this).data('rows');
+		var sliderDir = $(this).data('dir');
+
+		if ( productsQ > 4 && sliderRows == 1 ) {
+			var carouselVar = new Swiper( sliderId, {
+				effect: 'slide',
+				slidesPerView: 4,
+				spaceBetween: 30,
+				loop: true,
+				speed: 500,
+				autoplayDisableOnInteraction: false,
+
+				breakpoints: {
+					992: {
+						slidesPerView: 3
+					},
+					768: {
+						slidesPerView: 2
+					},
+					480: {
+						slidesPerView: 1
+					}
+				},
+
+				prevButton: sliderPrev,
+				nextButton: sliderNext,
+
+			});
+			
+			$(window).on('load', function() {
+				carouselVar.onResize(); // updating swiper after loading
+			});
+		};
+		
+
+
+		if ( productsQ > 8 && sliderRows == 2 ) {
+
+			var slider1 = sliderId + ' .swiper_1';
+			var slider2 = sliderId + ' .swiper_2';
+			var slider1_prev = sliderId + ' .swiper_1 .carousel_1_prev';
+			var slider1_next = sliderId + ' .swiper_2 .carousel_1_next';
+			var slider2_prev = sliderId + ' .swiper_1 .carousel_2_prev';
+			var slider2_next = sliderId + ' .swiper_2 .carousel_2_next';
+
+			var carousel_1 = new Swiper( slider1, {
+				effect: 'slide',
+				slidesPerView: 4,
+				spaceBetween: 30,
+				loop: true,
+				speed: 500,
+				autoplayDisableOnInteraction: false,
+
+				breakpoints: {
+					992: {
+						slidesPerView: 3
+					},
+					768: {
+						slidesPerView: 2
+					},
+					480: {
+						slidesPerView: 1
+					}
+				},
+
+				prevButton: slider1_prev,
+				nextButton: slider1_next,
+
+			});
+
+
+			var carousel_2 = new Swiper( slider2, {
+				effect: 'slide',
+				slidesPerView: 4,
+				spaceBetween: 30,
+				loop: true,
+				speed: 500,
+				autoplayDisableOnInteraction: false,
+
+				breakpoints: {
+					992: {
+						slidesPerView: 3
+					},
+					768: {
+						slidesPerView: 2
+					},
+					480: {
+						slidesPerView: 1
+					}
+				},
+
+				prevButton: slider2_prev,
+				nextButton: slider2_next,
+
+			});
+
+			if (sliderDir == 1) {
+				$(sliderPrev).on('click', function() {
+					carousel_1.slidePrev();
+					carousel_2.slidePrev();
+				});
+				$(sliderNext).on('click', function() {
+					carousel_1.slideNext();
+					carousel_2.slideNext();
+				});
+			} else {
+				$(sliderPrev).on('click', function() {
+					carousel_1.slidePrev();
+					carousel_2.slideNext();
+				});
+				$(sliderNext).on('click', function() {
+					carousel_1.slideNext();
+					carousel_2.slidePrev();
+				});
+			};
+			
+			$(window).on('load', function() {
+				carousel_1.onResize(); // updating swiper after loading
+				carousel_2.onResize(); 
+			});
+
+		};
+
+
+
+	});
+
+});
+{% endjavascript %}

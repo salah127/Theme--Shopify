@@ -1,0 +1,330 @@
+<div class="section_filter_block">
+	{% if section.settings.show_section %}
+		<div class="filter_content_main" id="filter_{{ section.id }}" data-canonical="{{ canonical_url }}">
+			<h3 class="widget_header filter_title">{{ section.settings.title }}</h3>
+			<p class="filter_text">{{ section.settings.text }}</p>
+
+			<div class="filter_content">
+				<div class="content_row">
+					{% if section.settings.filter_category %}
+						<div class="select_wrap">
+							<p>Category</p>
+							<select id="category_select" class="filter_select" autocomplete="off">
+								<option value="all">All</option>
+								{% for collection in collections %}
+									<option value="{{ collection.title | handleize }}">{{ collection.title | escape }}</option>
+								{% endfor %}
+							</select>
+						</div>	
+					{% endif %}
+
+					{% if section.settings.custom_tags_1.size > 0 %}
+						<div class="select_wrap">
+							<p class="select_caption">{{ section.settings.custom_tags_caption_1}}</p>
+
+							{% assign tagList = section.settings.custom_tags_1 | split: ',' %}
+
+							{% if tagList.size > 0 %}
+								<select id="tag_select_1" class="filter_select" autocomplete="off">
+									<option value="all">All</option>
+
+									{% for tagItem in tagList %}
+										<option value="{{ tagItem | handleize }}">{{ tagItem | escape  }}</option>
+									{% endfor %}
+								</select>
+							{% endif %}
+						</div>
+					{% endif %}
+
+					{% if section.settings.custom_tags_2.size > 0 %}
+						<div class="select_wrap">
+							<p class="select_caption">{{ section.settings.custom_tags_caption_2}}</p>
+
+							{% assign tagList = section.settings.custom_tags_2 | split: ',' %}
+
+							{% if tagList.size > 0 %}
+								<select id="tag_select_2" class="filter_select" autocomplete="off">
+									<option value="all">All</option>
+
+									{% for tagItem in tagList %}
+										<option value="{{ tagItem | handleize }}">{{ tagItem | escape  }}</option>
+									{% endfor %}
+								</select>
+							{% endif %}
+						</div>
+					{% endif %}
+
+					{% if section.settings.filter_type %}
+						<div class="select_wrap">
+							<p>Type</p>
+							<select id="type_select" class="filter_select" autocomplete="off">
+								<option value="all">All</option>
+								{% for product_type in shop.types %}
+									<option value="{{ product_type | url_escape }}">{{ product_type | escape  }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					{% endif %}
+				</div>
+
+				<div class="button_row">	
+					<button class="btn" id="sort_btn">{{ section.settings.button }}</button>
+				</div>
+			</div>
+		</div>
+		
+	{% endif %}
+
+		{%- assign name_tags = false -%}
+		{%- assign color_tags = false -%}
+		{%- for block in section.blocks -%}
+			{%- if block.type == 'name_tag' -%}
+				{%- assign name_tags = true -%}
+			{%- endif -%}
+			{%- if block.type == 'color_tag' -%}
+				{%- assign color_tags = true -%}
+			{%- endif -%}
+		{%- endfor -%}
+
+		{% if name_tags %}
+			<div class="name_sort_block">
+				<h3 class="widget_header">{{ section.settings.tag_option_heading }}</h3>
+
+				{% for block in section.blocks %}
+					{% if block.type == 'name_tag' %}
+						{% if collection.title == 'Products' or canonical_url contains 'types?' or canonical_url contains 'vendors?' or canonical_url contains settings.wishlist_page or canonical_url contains 'search?' %}
+							<a class="name_sort_item" href="{{ shop.url }}/collections/all/{{ block.settings.name_tag | handleize }}">{{ block.settings.name_tag }}</a>
+						{% else %}
+							<a class="name_sort_item" href="{{ shop.url }}/collections/{{ collection.title | handleize }}/{{ block.settings.name_tag | handleize }}">{{ block.settings.name_tag }}</a>
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+			</div>
+		{% endif %}	
+
+		{% if color_tags %}
+			<div class="color_sort_block">
+				<h3 class="widget_header">{{ section.settings.color_option_heading }}</h3>
+
+				{% for block in section.blocks %}
+					{% if block.type == 'color_tag' %}
+						{% if collection.title == 'Products' or canonical_url contains 'types?' or canonical_url contains 'vendors?' or canonical_url contains settings.wishlist_page or canonical_url contains 'search?' %}
+							<a class="color_sort_item" href="{{ shop.url }}/collections/all/{{ block.settings.color_tag | handleize }}" title="{{ block.settings.color_tag }}" style="background-color: {{ block.settings.color_tag_items }};"></a>
+						{% else %}
+							<a class="color_sort_item" href="{{ shop.url }}/collections/{{ collection.title | handleize }}/{{ block.settings.color_tag | handleize }}" title="{{ block.settings.color_tag }}" style="background-color: {{ block.settings.color_tag_items }};"></a>
+						{% endif %}
+					{% endif %}
+				
+				{% endfor %}
+			</div>
+		{% endif %}
+</div>
+
+{% comment %}?constraint=Name{% endcomment %}
+
+{% schema %}
+{
+	"name": "Sidebar sort",
+	"class": "page_sidebar_sort sidebar_widget",
+	"max_blocks": 20,
+	"settings": [
+		{
+			"type": "header",
+			"content": "Sidebar filters"
+		},
+		{
+			"type": "checkbox",
+			"id": "show_section",
+			"label": "Show Filter"
+		},
+		{
+			"type": "text",
+			"id": "title",
+			"label": "Heading",
+			"default": "Filter"
+		},
+		{
+			"type": "text",
+			"id": "text",
+			"label": "Text",
+			"default": "Search by products"
+		},
+		{
+			"type": "checkbox",
+			"id": "filter_category",
+			"label": "Filter by category"
+		},
+		{
+			"type": "checkbox",
+			"id": "filter_type",
+			"label": "Filter by type"
+		},
+		{
+			"type": "paragraph",
+			"content": "Filter by tag"
+		},
+		{
+			"type": "text",
+			"id": "custom_tags_caption_1",
+			"label": "Tag #1 caption",
+			"default": "Tag #1"
+		},
+		{
+			"type": "text",
+			"id": "custom_tags_1",
+			"label": "Filter by tag #1",
+			"info": "Add tags separated by commas!"
+		},
+		{
+			"type": "text",
+			"id": "custom_tags_caption_2",
+			"label": "Tag #2 caption",
+			"default": "Tag #2"
+		},
+		{
+			"type": "text",
+			"id": "custom_tags_2",
+			"label": "Filter by tag #2",
+			"info": "Add tags separated by commas!"
+		},
+		{
+			"type": "text",
+			"id": "button",
+			"label": "Button text",
+			"default": "Show"
+		},
+		{
+			"type": "header",
+			"content": "Color & tag filter"
+		},
+		{
+			"type": "text",
+			"id": "color_option_heading",
+			"label": "Color option title",
+			"default": "Color"
+		},
+		{
+			"type": "text",
+			"id": "tag_option_heading",
+			"label": "Tag option title",
+			"default": "Tag name"
+		}
+	],
+	"blocks": [
+		// COLORS FILTER ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "color_tag",
+			"name": "Color",
+			"settings": [
+				{
+					"type": "text",
+					"id": "color_tag",
+					"label": "Color tag"
+				},
+				{
+					"type": "color",
+					"id": "color_tag_items",
+					"label": "Element color"
+				}
+			]
+		},
+
+
+		// TAG FILTER ///////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "name_tag",
+			"name": "Tag name",
+			"settings": [
+				{
+					"type": "text",
+					"id": "name_tag",
+					"label": "Color tag"
+				}
+			]
+		}
+	]
+}
+{% endschema %}
+
+
+{% javascript %}
+jQuery(document).ready(function($) {
+	$('.section_filter_block .filter_content_main').each(function(i) {
+
+		$('.filter_select option[value="all"]').prop('selected', 'true');
+
+		var queryCollection = 'all/';
+		var queryType = '';
+		var queryTag1 = '';
+		var queryTag2 = '';
+
+		// SELECT CATEGORY
+		$('#category_select').on('change', function() {
+			$('#type_select option[value="all"]').prop('selected', 'true');
+			queryCollection = $(this).prop('value') + '/';
+
+			return queryCollection, queryType = '';
+		});
+		
+		// SELECT TYPE
+		$('#type_select').on('change', function() {
+			
+			if ($(this).prop('value') == 'all') {
+				queryType = '';
+			} else {
+				$('#category_select option[value="all"]').prop('selected', 'true');
+				$('#tag_select_1 option[value="all"]').prop('selected', 'true');
+				$('#tag_select_2 option[value="all"]').prop('selected', 'true');
+
+				queryType = 'types?q=' + $(this).prop('value');
+			};
+			return queryType, queryCollection = '', queryTag1 = '', queryTag2 = '';
+		});
+		
+		// SELECT TAG 1
+		$('#tag_select_1').on('change', function() {
+
+			if ($(this).prop('value') == 'all') {
+				queryTag1 = '';
+			} else {
+				$('#type_select option[value="all"]').prop('selected', 'true');
+				queryTag1 = $(this).prop('value');
+			};
+			return queryTag1, queryType = '';
+		});
+		
+		// SELECT TAG 2
+		$('#tag_select_2').on('change', function() {
+			if ($(this).prop('value') == 'all') {
+				queryTag2 = '';
+			} else {
+				$('#type_select option[value="all"]').prop('selected', 'true');
+				queryTag2 = $(this).prop('value');
+			};
+			return queryTag2, queryType = '';
+		});
+		
+		
+		// CREATE A QUERY
+		$('#sort_btn').on('click', function() {
+
+			var emptyTag = ( queryTag1 + queryTag2 );
+			var queryTag = '';
+
+			if ( queryTag1 ) { queryTag = queryTag + queryTag1; };
+			if ( queryTag2 ) { queryTag = queryTag + '+' + queryTag2; };
+			if ( queryTag[0] == '+' ) { queryTag = queryTag.substr(1); };
+			if ( emptyTag ) { queryTag = queryTag + '/' };
+
+
+		var location = '/collections/' + queryCollection + queryTag + queryType;
+			document.location.href = location;
+			//console.log(location);
+		});
+
+	});
+
+
+});
+{% endjavascript %}
+

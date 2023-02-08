@@ -1,0 +1,20 @@
+<div class="template_contact">
+	<div class="container">
+
+		{% if settings.contact_map %}
+			{% section 'index-map' %}
+		{% endif %}
+
+		{% if page.content.size > 0 %}
+			<div class="rte">
+				{{ page.content }}
+			</div>
+		{% endif %}
+
+		{% if settings.contact_map %}
+			{% section 'template-contact' %}
+		{% endif %}
+
+	</div>
+
+</div>

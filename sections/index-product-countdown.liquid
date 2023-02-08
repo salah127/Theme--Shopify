@@ -1,0 +1,770 @@
+<div class="container">
+	{% if section.settings.section_title.size > 0 %}
+		<h2 class="section_heading">{{ section.settings.section_title | escape }}</h2>
+	{% endif %}
+
+	<div class="row">
+		{% for block in section.blocks %}
+			{% case section.settings.blocks_width %}
+				{% when 'col-sm-4'  %}
+					{% case section.settings.block_size %}
+						{% when 'small'  %}{%- assign product_img_size = '370x240' -%}
+						{% when 'big' %}{%- assign product_img_size = '370x365' -%}
+					{% endcase %}
+				{% when 'col-sm-6' %}
+					{% case section.settings.block_size %}
+					{% when 'small'  %}{%- assign product_img_size = '570x365' -%}
+					{% when 'big' %}{%- assign product_img_size = '570x412' -%}
+				{% endcase %}
+			{% endcase %}
+			
+			{% case block.type %}
+				{% when 'countdown' %}
+					<div class="col-xs-12 {{ section.settings.blocks_width }} timer_item item_{{ section.settings.block_size }}">
+
+						<div class="banner_wrap">
+							{% if block.settings.image %}
+								<div class="banner_image img_placeholder__wrap" style="background-image: url( {{ block.settings.image | img_url: product_img_size, crop: block.settings.img_alignment }} );"></div>
+							{% else %}
+								<div class="banner_image img_placeholder__wrap">
+									{% capture current %}{% cycle 1, 2, 3, 4 %}{% endcapture %}
+									{{ 'collection-' | append: current | placeholder_svg_tag: 'img_placeholder' }}
+								</div>
+							{% endif %}
+
+							<div class="banner_caption align_{{ block.settings.caption_alignment }} text_align_{{ block.settings.text_align }}  {% if block.settings.inverted %}inverted{% endif %}">  
+								{% if block.settings.button_link.size > 0 and block.settings.button_text.size == 0 %}
+									<a class="banner_text banner_link" href="{{ block.settings.button_link }}">
+								{% else %}
+									<div class="banner_text">
+								{% endif %}	
+
+									<div class="timer">
+										<div class="countdown_timer" id="timer_{{ forloop.index }}_{{ section.id }}" data-day="{{ block.settings.countdown_date_day }}" data-month="{{ block.settings.countdown_date_month }}" data-year="{{ block.settings.countdown_date_year }}">
+											<p class="countdown_days">
+												<input class="days"><span>{{ 'layout.countdown.days' | t }}</span>
+											</p>
+											<p class="countdown_hours">
+												<input class="hour"><span>{{ 'layout.countdown.hours' | t }}</span>
+											</p>
+											<p class="countdown_minuts">
+												<input class="minute"><span>{{ 'layout.countdown.minutes' | t }}</span>
+											</p>
+											<p class="countdown_seconds">
+												<input class="second"><span>{{ 'layout.countdown.seconds' | t }}</span>
+											</p>
+										</div>
+									</div>
+									
+									<div class="text_el">
+										{% if block.settings.title.size > 0 %}
+											<div {% if settings.text-animation and block.settings.title_effect != 'none' %} class="banner_title title_animation" data-in-effect="{{ block.settings.title_effect }}" id="title_{{ section.id }}_{{ block.id }}"{% else %} class="banner_title"{% endif %}>{{ block.settings.title }}</div>
+										{% endif %}
+
+										{% if block.settings.text.size > 0 %}
+											<p class="text">{{ block.settings.text }}</p>
+										{% endif %}
+
+										{% if block.settings.button_link.size > 0 and block.settings.button_text.size > 0 %}
+											<a class="btn banner_btn" href="{{ block.settings.button_link }}">{{ block.settings.button_text }}</a>
+										{% endif %}
+									</div>
+								{% if block.settings.button_link.size > 0 and block.settings.button_text.size == 0 %}
+									</a>
+								{% else %}
+									</div>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+
+					{% when 'banner' %}
+						<div class="col-xs-12 {{ section.settings.blocks_width }} banner_item item_{{ section.settings.block_size }}">
+							<div class="banner_wrap">
+								{% if block.settings.image %}
+									<div class="banner_image img_placeholder__wrap" style="background-image: url( {{ block.settings.image | img_url: product_img_size, crop: block.settings.img_alignment }} );"></div>
+								{% else %}
+									<div class="banner_image img_placeholder__wrap">
+										{% capture current %}{% cycle 1, 2, 3, 4 %}{% endcapture %}
+										{{ 'collection-' | append: current | placeholder_svg_tag: 'img_placeholder' }}
+									</div>
+								{% endif %}
+
+								<div class="banner_caption align_{{ block.settings.caption_alignment }} text_align_{{ block.settings.text_align }} {% if block.settings.inverted %}inverted{% endif %}">
+									{% if block.settings.button_link.size > 0 and block.settings.button_text.size == 0 %}
+										<a class="banner_text banner_link" href="{{ block.settings.button_link }}">
+									{% else %}
+										<div class="banner_text">
+									{% endif %}
+										{% if block.settings.subtitle.size > 0 %}
+											<h4>{{ block.settings.subtitle }}</h4>
+										{% endif %}
+
+										{% if block.settings.title.size > 0 %}
+											<div {% if settings.text-animation and block.settings.title_effect != 'none' %} class="banner_title title_animation" data-in-effect="{{ block.settings.title_effect }}" id="title_{{ section.id }}_{{ block.id }}"{% else %} class="banner_title"{% endif %}>{{ block.settings.title }}</div>
+										{% endif %}
+
+										{% if block.settings.text.size > 0 %}
+											<p class="text">{{ block.settings.text }}</p>
+										{% endif %}
+
+										{% if block.settings.button_link.size > 0 and block.settings.button_text.size > 0 %}
+											<a class="btn banner_btn" href="{{ block.settings.button_link }}">{{ block.settings.button_text }}</a>
+										{% endif %}
+
+									{% if block.settings.button_link.size > 0 and block.settings.button_text.size == 0 %}
+										</a>
+									{% else %}
+										</div>
+									{% endif %}
+								</div>
+							</div>
+						</div>
+			{% endcase %}
+		{% endfor %}
+		
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "Banners countdown",
+	"class": "section section_homepage section_banners-countdown",
+	"max_blocks": 6,
+	"settings": [
+		{
+			"type": "text",
+			"id": "section_title",
+			"label": "Title",
+			"default": "Banners countdown"
+		},
+		{
+			"type": "select",
+			"id": "blocks_width",
+			"label": "Blocks width",
+			"default": "col-sm-6",
+			"options": [
+				{
+					"value": "col-sm-6",
+					"label": "50%"
+				},
+				{
+					"value": "col-sm-4",
+					"label": "33%"
+				}
+			]
+		},
+		{
+			"type": "radio",
+			"id": "block_size",
+			"label": "Banner size",
+			"options": [
+				{ 
+					"value": "small", 
+					"label": "Small" 
+				},
+				{ 
+					"value": "big", 
+					"label": "Big" 
+				}
+			],
+			"default": "small",
+			"info": "Select banner height"
+		}
+	],
+	"blocks": [
+		// PRODUCT BANNER ///////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "banner",
+			"name": "Banner",
+			"settings": [
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "Background image",
+					"info": "Image size 570x365px."
+				},
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "select",
+					"id": "caption_alignment",
+					"label": "Caption alignment",
+					"options": [
+						{
+							"value": "left",
+							"label": "Left"
+						},
+						{
+							"value": "center",
+							"label": "Center"
+						},
+						{
+							"value": "right",
+							"label": "Right"
+						}
+					]
+				},
+				{
+					"type": "radio",
+					"id": "text_align",
+					"label": "Text align",
+					"options": [
+						{ 
+							"value": "left", 
+							"label": "Left" 
+						},
+						{ 
+							"value": "center", 
+							"label": "Center" 
+						}
+					],
+					"default": "left",
+					"info": "Select text align"
+				},
+				{
+					"type": "checkbox",
+					"id": "inverted",
+					"label": "Inverted style"
+				},
+				{
+					"type": "text",
+					"id": "subtitle",
+					"label": "Subtitle"
+				},
+				{
+					"type": "richtext",
+					"id": "title",
+					"label": "Title",
+					"default": "<p>Talk about your brand</p>"
+				},
+				{
+					"type": "select",
+					"id": "title_effect",
+					"label": "Title effect",
+					"default": "none",
+					"info": "Before using, you need to enable animation in the general settings",
+					"options": [
+						{
+							"label": "None",
+							"value": "none"
+						},
+						{
+							"label": "RollIn",
+							"value": "rollIn"
+						},
+						{
+							"label": "Flip",
+							"value": "flip"
+						},
+						{
+							"label": "Flash",
+							"value": "flash"
+						},
+						{
+							"label": "Pulse",
+							"value": "pulse"
+						},
+						{
+							"label": "Swing",
+							"value": "swing"
+						},
+						{
+							"label": "Tada",
+							"value": "tada"
+						},
+						{
+							"label": "Wobble",
+							"value": "wobble"
+						},
+						{
+							"label": "Fade In",
+							"value": "fadeIn"
+						},
+						{
+							"label": "Rotate In",
+							"value": "rotateIn"
+						},
+						{
+							"label": "Shake",
+							"value": "shake"
+						},
+						{
+							"label": "Bounce",
+							"value": "bounce"
+						},
+						{
+							"label": "Bounce In Up",
+							"value": "bounceInUp"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"id": "text",
+					"label": "Text",
+					"default": "Use this text to share information about your brand."
+				},
+				{
+					"type": "url",
+					"id": "button_link",
+					"label": "Button link"
+				},
+				{
+					"type": "text",
+					"id": "button_text",
+					"label": "Button text",
+					"default": "Shop Now"
+				}
+			]
+		},
+
+
+
+		// PRODUCT TIMER ///////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "countdown",
+			"name": "Timer",
+			"settings": [
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "Background image",
+					"info": "Image size 570x365px."
+				},
+				{
+					"type": "select",
+					"id": "img_alignment",
+					"label": "Image alignment",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "center",
+							"label": "Middle"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "select",
+					"id": "caption_alignment",
+					"label": "Caption alignment",
+					"options": [
+						{
+							"value": "left",
+							"label": "Left"
+						},
+						{
+							"value": "center",
+							"label": "Center"
+						},
+						{
+							"value": "right",
+							"label": "Right"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "radio",
+					"id": "text_align",
+					"label": "Text align",
+					"options": [
+						{ 
+							"value": "left", 
+							"label": "Left" 
+						},
+						{ 
+							"value": "center", 
+							"label": "Center" 
+						}
+					],
+					"default": "left",
+					"info": "Select text align"
+				},
+				{
+					"type": "checkbox",
+					"id": "inverted",
+					"label": "Inverted style"
+				},
+				{
+					"type": "richtext",
+					"id": "title",
+					"label": "Title",
+					"default": "<p>Talk about your brand</p>"
+				},
+				{
+					"type": "select",
+					"id": "title_effect",
+					"label": "Title effect",
+					"default": "none",
+					"info": "Before using, you need to enable animation in the general settings",
+					"options": [
+						{
+							"label": "None",
+							"value": "none"
+						},
+						{
+							"label": "RollIn",
+							"value": "rollIn"
+						},
+						{
+							"label": "Flip",
+							"value": "flip"
+						},
+						{
+							"label": "Flash",
+							"value": "flash"
+						},
+						{
+							"label": "Pulse",
+							"value": "pulse"
+						},
+						{
+							"label": "Swing",
+							"value": "swing"
+						},
+						{
+							"label": "Tada",
+							"value": "tada"
+						},
+						{
+							"label": "Wobble",
+							"value": "wobble"
+						},
+						{
+							"label": "Fade In",
+							"value": "fadeIn"
+						},
+						{
+							"label": "Rotate In",
+							"value": "rotateIn"
+						},
+						{
+							"label": "Shake",
+							"value": "shake"
+						},
+						{
+							"label": "Bounce",
+							"value": "bounce"
+						},
+						{
+							"label": "Bounce In Up",
+							"value": "bounceInUp"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"id": "text",
+					"label": "Text",
+					"default": "Use this text to share information about your brand."
+				},
+				{
+					"type": "url",
+					"id": "button_link",
+					"label": "Button link"
+				},
+				{
+					"type": "text",
+					"id": "button_text",
+					"label": "Button text",
+					"default": "Shop Now"
+				},
+				{
+					"type": "header",
+					"content": "Countdown date"
+				}, 
+				{
+					"type": "select",
+					"id": "countdown_date_day",
+					"label": "Day",
+					"options": [
+						{
+							"value": "1",
+							"label": "1"
+						},
+						{
+							"value": "2",
+							"label": "2"
+						},
+						{
+							"value": "3",
+							"label": "3"
+						},
+						{
+							"value": "4",
+							"label": "4"
+						},
+						{
+							"value": "5",
+							"label": "5"
+						},
+						{
+							"value": "6",
+							"label": "6"
+						},
+						{
+							"value": "7",
+							"label": "7"
+						},
+						{
+							"value": "8",
+							"label": "8"
+						},
+						{
+							"value": "9",
+							"label": "9"
+						},
+						{
+							"value": "10",
+							"label": "10"
+						},
+						{
+							"value": "11",
+							"label": "11"
+						},
+						{
+							"value": "12",
+							"label": "12"
+						},
+						{
+							"value": "13",
+							"label": "13"
+						},
+						{
+							"value": "14",
+							"label": "14"
+						},
+						{
+							"value": "15",
+							"label": "15"
+						},
+						{
+							"value": "16",
+							"label": "16"
+						},
+						{
+							"value": "17",
+							"label": "17"
+						},
+						{
+							"value": "18",
+							"label": "18"
+						},
+						{
+							"value": "19",
+							"label": "19"
+						},
+						{
+							"value": "20",
+							"label": "20"
+						},
+						{
+							"value": "21",
+							"label": "21"
+						},
+						{
+							"value": "22",
+							"label": "22"
+						},
+						{
+							"value": "23",
+							"label": "23"
+						},
+						{
+							"value": "24",
+							"label": "24"
+						},
+						{
+							"value": "25",
+							"label": "25"
+						},
+						{
+							"value": "26",
+							"label": "26"
+						},
+						{
+							"value": "27",
+							"label": "27"
+						},
+						{
+							"value": "28",
+							"label": "28"
+						},
+						{
+						   "value": "29",
+						   "label": "29"
+						},
+						{
+							"value": "30",
+							"label": "30"
+						},
+						{
+							"value": "31",
+							"label": "31"
+						}
+					]
+				},
+				{
+					"type": "select",
+					"id": "countdown_date_month",
+					"label": "Month",
+					"options": [
+						{
+							"value": "01",
+							"label": "January"
+						},
+						{
+							"value": "02",
+							"label": "February"
+						},
+						{
+							"value": "03",
+							"label": "March"
+						},
+						{
+							"value": "04",
+							"label": "April"
+						},
+						{
+							"value": "05",
+							"label": "May"
+						},
+						{
+							"value": "06",
+							"label": "June"
+						},
+						{
+							"value": "07",
+							"label": "July"
+						},
+						{
+							"value": "08",
+							"label": "August"
+						},
+						{
+							"value": "09",
+							"label": "September"
+						},
+						{
+							"value": "10",
+							"label": "October"
+						},
+						{
+							"value": "11",
+							"label": "November"
+						},
+						{
+							"value": "12",
+							"label": "December"
+						}
+					]
+				},
+				{
+					"type": "select",
+					"id": "countdown_date_year",
+					"label": "Year",
+					"options": [
+						{
+							"value": "2018",
+							"label": "2018"
+						},
+						{
+							"value": "2019",
+							"label": "2019"
+						},
+						{
+							"value": "2020",
+							"label": "2020"
+						},
+						{
+							"value": "2021",
+							"label": "2021"
+						},
+						{
+							"value": "2022",
+							"label": "2022"
+						},
+						{
+							"value": "2023",
+							"label": "2023"
+						},
+						{
+							"value": "2024",
+							"label": "2024"
+						},
+						{
+							"value": "2025",
+							"label": "2025"
+						},
+						{
+							"value": "2026",
+							"label": "2026"
+						}
+					]
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Banners countdown",
+			"category": "Image",
+			"settings": {
+
+			},
+			"blocks": [
+				{
+					"type": "countdown"
+				},
+				{
+					"type": "banner"
+				}
+			]
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) {
+	$('.countdown_timer').each(function(i) {
+
+		var timerId = '#' + $(this).attr('id');
+		var countdownDay = $(this).data('day');
+		var countdownMonth = $(this).data('month');
+		var countdownYear = $(this).data('year');
+		
+		$( timerId ).ccountdown(countdownYear, countdownMonth, countdownDay,'00:00'); 
+		
+	});
+
+});
+{% endjavascript %}

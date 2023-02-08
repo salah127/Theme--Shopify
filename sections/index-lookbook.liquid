@@ -1,0 +1,174 @@
+<div class="lookbook_wrap container">
+	<div class="lookbook_img">
+		{%- if section.settings.image.size > 0 -%}
+			<div class="img_placeholder__wrap" style="background-image: url( {{ section.settings.image | img_url: '1170x440', crop: block.settings.img_alignment }} );"></div>
+		{%- else -%}
+			<div class="img_placeholder__wrap img_placeholder__{{ section.settings.img_size }}">
+				{{ 'lifestyle-1' | placeholder_svg_tag: 'img_placeholder' }}
+			</div>
+		{%- endif -%}
+	</div>
+
+	<div class="lookbook_container container">
+		{%- for block in section.blocks -%}
+			{%- assign itemProduct = all_products[block.settings.item_product] -%}
+
+			<div class="lookbook_item caption_{{ block.settings.item_horizontal_align }} caption_{{ block.settings.item_vertical_align }}" style="left: {{ block.settings.item_x }}%;top: {{ block.settings.item_y }}%;">
+				{%- if itemProduct.id.size > 0 -%}
+					<a class="lookbook_item__bullet" href="{{ itemProduct.url }}">
+						<i class="fa fa-plus" aria-hidden="true"></i>
+					</a>
+
+					<a class="lookbook_item__caption" href="{{ itemProduct.url }}">
+						<img src="{{ itemProduct.featured_image.src | product_img_url: '80x100', crop: 'top'  }}" alt="{{ itemProduct.featured_image.alt }}">
+						<span class="product_name">{{ itemProduct.title | truncate:38 }}</span>
+						<span class="money">{{ itemProduct.price | money }}</span>
+					</a>
+				{%- else -%}
+					<i class="fa fa-plus lookbook_item__bullet" aria-hidden="true"></i>
+				{%- endif -%}
+
+			</div>
+
+		{%- endfor -%}
+	</div>
+</div>
+
+
+
+{% schema %}
+{
+	"name": "Lookbook",
+	"class": "section section_homepage section_lookbook",
+	"max_blocks": 7,
+	"settings": [
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "Image",
+			"info": "Image size 1170x440px."
+		},
+		{
+			"type": "select",
+			"id": "img_alignment",
+			"label": "Image alignment",
+			"options": [
+				{
+					"value": "top",
+					"label": "Top"
+				},
+				{
+					"value": "center",
+					"label": "Middle"
+				},
+				{
+					"value": "bottom",
+					"label": "Bottom"
+				}
+			]
+		}
+	],
+	"blocks": [
+		{
+			"type": "item",
+			"name": "Lookbook product",
+			"settings": [
+				{
+					"type": "header",
+					"content": "Product"
+				},
+				{
+					"type": "product",
+					"id": "item_product",
+					"label": "Product"
+				},
+				{
+					"type":    "range",
+					"id":      "item_x",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Horizontal position",
+					"default": 50
+				},
+				{
+					"type":    "range",
+					"id":      "item_y",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Vertical position",
+					"default": 50
+				},
+				{
+					"type": "radio",
+					"id": "item_horizontal_align",
+					"label": "Caption horizontal align",
+					"default": "left",
+					"options": [
+						{
+							"value": "left",
+							"label": "Left"
+						},
+						{
+							"value": "right",
+							"label": "Right"
+						}
+					]
+				},
+				{
+					"type": "radio",
+					"id": "item_vertical_align",
+					"label": "Caption vertical align",
+					"default": "bottom",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Lookbook",
+			"category": "Products"
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) {
+	$(window).on('load resize', function() {
+		
+		if ( $(window).width() < 991 ) {
+			$('.lookbook_item__bullet').each(function(i) {
+				var self = $(this);
+				var productLink = self.attr('href');
+				var prodCaption = self.siblings('.lookbook_item__caption');
+					
+				self.on('click', function(e){
+					e.preventDefault();
+					prodCaption.show(300);
+				});
+
+				prodCaption.on('click', function(e){
+					document.location.href = productLink;
+				});
+			});
+		};
+
+
+	});
+
+});
+{% endjavascript %}

@@ -1,0 +1,223 @@
+<div class="container">
+	<div class="row">
+		{% if section.settings.links.size > 0 %} 
+			{%- assign block_limit = 6 -%}
+			<div class="linklist_item {% if section.settings.link_limit == '12' %}linklist_big{% else %}linklist_small{% endif %}">
+				<div class="menu_wrap linklist_menu_item">
+					<h4 class="linklist_title">{{ linklists[section.settings.links].title }}<span class="menu_trigger"><i class="fa fa-caret-down"></i></span></h4>
+					<ul>
+						{% for link in linklists[section.settings.links].links limit: section.settings.link_limit %}
+							<li class="link_item">
+								<a class="linklist_link" href="{{ link.url }}">{{ link.title }}</a>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		{% else %}
+			{%- assign block_limit = 8 -%}
+		{% endif %}
+
+		<div class="collection_listing_wrap {% if section.settings.links.size > 0 %}with_menu{% endif %}">
+			{% for block in section.blocks limit: block_limit %}
+				<div class="{% if section.settings.links.size > 0 %}col-xs-4 {% cycle 'step3': 'item_3_1', '', '' %}{% else %}col-xs-3 {% cycle 'step4': 'item_4_1', '', '', '' %}{% endif %} {% cycle 'step2': 'item_2_1', '' %}">
+					{%- assign collection = collections[block.settings.item_collection] -%}
+
+					<div class="collection_item{% if block.settings.collection_hover_image %} hover_image{% endif %}" >  
+						{% if collection.empty? %}
+							<div class="layer_1">
+								<div class="img_placeholder__wrap img_placeholder__{{ section.settings.img_size }}">
+									{% capture current %}{% cycle 1, 2, 3, 4, 5, 6 %}{% endcapture %}
+									{{ 'collection-' | append: current | placeholder_svg_tag: 'img_placeholder' }}
+								</div>
+							</div>
+
+							<div class="layer_2">
+								<h3 class="collection_title">{{ 'layout.collection_listing.collection' | t }}</h3>
+							</div>
+						{% else %}
+							<div class="layer_1" {% if block.settings.collection_hover_image %}style="background: url({{  block.settings.collection_hover_image | img_url: '270x255', crop: 'center' }});"{% endif %}>
+								{% if block.settings.collection_image %}
+									{% capture collection_img_url %}{{ block.settings.collection_image | img_url: '270x255', crop: 'center' }}{% endcapture %}
+								{% elsif collection.image %}
+									{% capture collection_img_url %}{{ collection | img_url: '270x255', crop: 'center' }}{% endcapture %}
+								{% elsif collection.products.first %}
+									{% assign iteration_count = collection.products_count | minus:1 %}
+
+									{% for i in (0..iteration_count) %}
+										{% if collection.products[i].images.size > 0 %}
+											{% capture collection_img_url %}{{ collection.products[i].images.first | img_url: '270x255', crop: 'center' }}{% endcapture %}
+
+											{% break %}
+										{% else %}
+											{% assign collection_img_url = 0 %}
+										{% endif %}
+									{% endfor %}
+								{% else %}
+									{% assign collection_img_url = 0 %}
+								{% endif %}
+
+								{% if collection_img_url == 0 %}
+									<div class="img_placeholder__wrap"></div>
+								{% else %}
+									<div class="img_placeholder__wrap" style="background-image: url( {{ collection_img_url }} );"></div>
+								{% endif %}
+							</div>
+
+							<a href="{{ collection.url }}" class="layer_2">
+								{% if block.settings.collection_title.size > 0 %}
+									<div class="collection_title">{{ block.settings.collection_title }}</div>
+								{% else %}
+									<h3 class="collection_title">{{ collection.title }}</h3>
+								{% endif %}
+							</a>
+						{% endif %}
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+
+{% if section.settings.section_bg %}
+	<style>
+		#shopify-section-{{ section.id }} {background: url({{ section.settings.section_bg | img_url: '2048x', crop: 'center' }});background-size: cover;padding-top: 30px;}
+	</style>
+{% endif %}
+
+{% schema %}
+{
+	"name": "Collections with menu",
+	"class": "section section_homepage section_collections_with_menu",
+	"max_blocks": 8,
+	"settings": [
+		{
+			"type": "link_list",
+			"id": "links",
+			"label": "Choose linklist",
+			"info": "Max 12 links"
+		},
+		{
+			"type": "radio",
+			"id": "link_limit",
+			"label": "Link limit",
+			"options": [
+				{ 
+					"value": "12", 
+					"label": "Max 12 links" 
+				},
+				{ 
+					"value": "8", 
+					"label": "Max 8 links" 
+				}
+			],
+			"default": "12"
+		},
+		{
+			"type": "image_picker",
+			"id": "section_bg",
+			"label": "Section background image",
+			"info": "For higher quality upload images wider than 2048 pixels"
+		}
+	],
+	"blocks": [
+		{
+			"type": "featured_collection",
+			"name": "Collection",
+			"settings": [
+				{
+					"label": "Collection",
+					"id": "item_collection",
+					"type": "collection"
+				},
+				{
+					"type": "image_picker",
+					"id": "collection_image",
+					"label": "Collection image",
+					"info": "Image size 270x255px."
+				},
+				{
+					"type": "image_picker",
+					"id": "collection_hover_image",
+					"label": "Collection hover image",
+					"info": "Image size 270x255px."
+				},
+				{
+					"type": "richtext",
+					"id": "collection_title",
+					"label": "Collection title"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Collections with menu",
+			"category": "Collections",
+			"settings": {
+
+			},
+			"blocks": [
+				{
+					"type": "featured_collection"
+				},
+				{
+					"type": "featured_collection"
+				},
+				{
+					"type": "featured_collection"
+				},
+				{
+					"type": "featured_collection"
+				},
+				{
+					"type": "featured_collection"
+				},
+				{
+					"type": "featured_collection"
+				}
+			]
+		}
+	]
+}
+{% endschema %}
+
+
+
+{% javascript %}
+(function($) {
+	// MOBILE MENU SHOW/HIDE
+	$(window).on('load', function() {
+		$('.linklist_menu_item').each(function(i) {
+			var item = $(this);
+			var trigger = item.find('.menu_trigger');
+			var menu = item.find('ul');
+
+			var windowSizeWatch = function(){
+				if ( $(window).width() < 992 ) {
+					menu.hide(0);
+				} else {
+					menu.show(0);
+				}
+			};
+			
+			windowSizeWatch();
+			
+			$(window).on('resize', windowSizeWatch);
+
+			trigger.on('click', function(e){
+				if ( item.hasClass('open') ) {
+					item.removeClass('open');
+					menu.hide(500);
+				} else {
+					item.addClass('open');
+					menu.show(500);
+				};
+			});
+		});
+	});
+
+})(jQuery);
+{% endjavascript %}
+
